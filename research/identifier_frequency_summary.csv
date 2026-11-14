@@ -1,0 +1,6 @@
+metric,value
+total_records,6362620
+unique_sender_ids,6353307
+sender_ids_with_multiple_transactions,9298
+unique_recipient_ids,2722362
+recipient_ids_with_multiple_transactions,459658

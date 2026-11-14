@@ -55,3 +55,44 @@ No exact duplicate records were detected.
 - Repeated sender and recipient identifiers
   are not necessarily duplicate transactions.
 - Near-duplicates were not investigated in this audit.
+
+
+## 3. Identifier Frequency Investigation
+
+### Methodology
+- Processed all transaction records.
+- Counted sender occurrences using nameOrig.
+- Counted recipient occurrences using nameDest.
+- Used SQLite for disk-based frequency aggregation.
+- Processed records in batches of 50,000.
+
+### Results
+
+Total Records: 6,362,620
+
+Unique Sender IDs: 6,353,307
+Sender IDs Appearing More Than Once: 9,298
+
+Unique Recipient IDs: 2,722,362
+Recipient IDs Appearing More Than Once: 459,658
+
+Highest Sender Frequency: 3
+Highest Recipient Frequency: 113
+
+### Findings
+
+Recipient identifiers appear repeatedly
+more frequently than sender identifiers.
+
+The most frequent recipient appeared in
+113 transaction records.
+
+The ten sender identifiers returned by
+the ranking query each appeared three times.
+
+### Limitations
+
+- Identifiers do not necessarily represent unique human customers.
+- Recipient identifiers can represent customer accounts or merchants.
+- Repeated identifiers do not indicate duplicate transactions.
+- Frequency alone cannot establish fraudulent activity.
