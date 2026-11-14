@@ -27,3 +27,31 @@ CSV missing-value recognition.
 Zero values are not automatically treated as
 missing values. Structurally unavailable data
 requires separate investigation.
+
+## 2. Exact Duplicate Record Investigation
+
+### Methodology
+
+- Processed the complete CSV.
+- Compared all 11 columns.
+- Used Python CSV reader and SQLite.
+- Processed records in batches of 50,000.
+- Compared complete parsed row values.
+
+### Results
+
+Total Records: 6,362,620
+Unique Records: 6,362,620
+Exact Duplicate Rows: 0
+Duplicate Percentage: 0.000000%
+
+### Finding
+
+No exact duplicate records were detected.
+
+### Limitations
+
+- PaySim does not provide a dedicated transaction ID.
+- Repeated sender and recipient identifiers
+  are not necessarily duplicate transactions.
+- Near-duplicates were not investigated in this audit.
