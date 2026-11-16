@@ -96,3 +96,52 @@ the ranking query each appeared three times.
 - Recipient identifiers can represent customer accounts or merchants.
 - Repeated identifiers do not indicate duplicate transactions.
 - Frequency alone cannot establish fraudulent activity.
+
+
+## 4. Transaction Category Validation
+
+Total Records: 6,362,620
+
+Expected Categories:
+- CASH_OUT: 2,237,500
+- PAYMENT: 2,151,495
+- CASH_IN: 1,399,284
+- TRANSFER: 532,909
+- DEBIT: 41,432
+
+Unexpected Categories: 0
+
+Finding:
+All five expected transaction categories were
+identified. No unexpected category values were found.
+
+## 5. Fraud Flag Validation
+
+### isFraud
+- Value 0: 6,354,407
+- Value 1: 8,213
+
+### isFlaggedFraud
+- Value 0: 6,362,604
+- Value 1: 16
+
+Unexpected Values: 0
+
+Finding:
+Both fraud indicator columns contain only
+the expected binary values.
+
+## 6. Numeric Quality Investigation
+
+Finding:
+- No negative values were detected in the
+  six investigated numeric columns.
+- No blank, non-numeric or non-finite values
+  were detected.
+- Sixteen transactions have zero amounts.
+- Multiple balance columns contain zero values.
+- Observed step range: 1 to 743.
+
+Limitation:
+Zero balances are not automatically considered
+missing or invalid. Further investigation is required.

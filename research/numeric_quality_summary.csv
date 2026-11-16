@@ -1,0 +1,7 @@
+column_name,blank_count,non_numeric_count,non_finite_count,negative_count,zero_count,out_of_expected_range_count,minimum,maximum
+step,0,0,0,0,0,0.0,1.0,743.0
+amount,0,0,0,0,16,,0.0,92445516.64
+oldbalanceOrg,0,0,0,0,2102449,,0.0,59585040.37
+newbalanceOrig,0,0,0,0,3609566,,0.0,49585040.37
+oldbalanceDest,0,0,0,0,2704388,,0.0,356015889.35
+newbalanceDest,0,0,0,0,2439433,,0.0,356179278.92

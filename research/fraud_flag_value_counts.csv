@@ -1,0 +1,5 @@
+column_name,flag_value,record_count,is_expected
+isFraud,0,6354407,True
+isFraud,1,8213,True
+isFlaggedFraud,0,6362604,True
+isFlaggedFraud,1,16,True

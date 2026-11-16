@@ -1,0 +1,6 @@
+transaction_type,transaction_count,is_expected
+CASH_OUT,2237500,True
+PAYMENT,2151495,True
+CASH_IN,1399284,True
+TRANSFER,532909,True
+DEBIT,41432,True
