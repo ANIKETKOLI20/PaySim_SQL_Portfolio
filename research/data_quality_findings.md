@@ -191,3 +191,46 @@ established from the available columns alone.
 These records should not automatically be treated
 as invalid transactions or removed from the dataset.
 Further investigation would be required.
+
+
+## 8. Balance Consistency Investigation
+
+### Methodology
+
+- Processed all 6,362,620 records.
+- Calculated sender balance movement.
+- Calculated recipient balance movement.
+- Compared movements against transaction amounts.
+- Used a tolerance of 0.01.
+- Excluded merchant destination balances from
+  recipient reconciliation.
+- Segmented results by transaction type and fraud label.
+
+### Key Findings
+
+1. CASH_IN sender balances frequently increased
+   by the transaction amount.
+
+2. Non-fraud CASH_OUT sender balances frequently
+   did not match the simple expected balance decrease.
+
+3. Non-fraud TRANSFER sender balances also showed
+   substantial unchanged and other movements.
+
+4. Non-fraud TRANSFER recipient balances frequently
+   increased by the transaction amount.
+
+5. 4,068 of 4,097 fraud-labelled TRANSFER records
+   had unchanged recipient balances.
+
+6. PAYMENT recipient balances could not be
+   reconciled because merchant balances are unavailable.
+
+### Limitations
+
+- The comparison uses simplified balance equations.
+- The "other" category does not prove data corruption.
+- Merchant destination balances cannot be reconciled.
+- The observed relationships do not establish causality.
+- Further investigation is needed before classifying
+  balance differences as data-quality errors.

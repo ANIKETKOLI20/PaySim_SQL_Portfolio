@@ -1,0 +1,8 @@
+transaction_type,isFraud,non_merchant_records,merchant_records,unchanged,matches_plus_amount,matches_minus_amount,other
+CASH_IN,0,1399284,0,160005,0,893650,345629
+CASH_OUT,0,2233384,0,1600,1790383,0,441401
+CASH_OUT,1,4116,0,18,3577,0,521
+DEBIT,0,41432,0,0,33174,0,8258
+PAYMENT,0,0,2151495,0,0,0,0
+TRANSFER,0,528812,0,106,413357,0,115349
+TRANSFER,1,4097,0,4068,2,0,27
