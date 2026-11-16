@@ -1,0 +1,5 @@
+dimension,value,record_count
+transaction_type,CASH_OUT,16
+isFraud,1,16
+isFlaggedFraud,0,16
+type_fraud_flag_combination,CASH_OUT|1|0,16

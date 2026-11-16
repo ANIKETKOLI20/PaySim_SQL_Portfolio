@@ -145,3 +145,49 @@ Finding:
 Limitation:
 Zero balances are not automatically considered
 missing or invalid. Further investigation is required.
+
+
+## 7. Zero-Amount Transaction Investigation
+
+### Methodology
+- Processed all 6,362,620 records.
+- Identified transactions where amount = 0.
+- Extracted complete original transaction records.
+- Examined transaction type, account balances and fraud indicators.
+
+### Results
+
+Total Zero-Amount Transactions: 16
+
+Transaction Type:
+- CASH_OUT: 16
+
+Fraud Classification:
+- isFraud = 1: 16
+- isFlaggedFraud = 0: 16
+
+### Key Findings
+
+1. All 16 transactions belong to CASH_OUT.
+2. All transactions have zero monetary value.
+3. Sender balances remain unchanged.
+4. Recipient balances remain unchanged.
+5. All records are labelled fraudulent in the simulation.
+6. None is flagged by the rule-based indicator.
+
+### Interpretation
+
+The records represent an unusual pattern of
+zero-value cash-out transactions.
+
+The existing fraud labels indicate that these
+records are classified as fraudulent by the simulator.
+
+The reason for this classification cannot be
+established from the available columns alone.
+
+### Limitation
+
+These records should not automatically be treated
+as invalid transactions or removed from the dataset.
+Further investigation would be required.
