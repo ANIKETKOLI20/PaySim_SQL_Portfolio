@@ -353,3 +353,76 @@ not the performance of a production fraud detection system.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q7. Sender Activity Distribution Analysis
+
+### Business Question
+
+How is transaction activity distributed between
+one-time and repeat-originator account identifiers,
+and what proportion of transaction volume and
+monetary value comes from each group?
+
+### Objective
+
+Understand sender activity patterns by identifying
+one-time and repeat-originator accounts and
+comparing their transaction and monetary contributions.
+
+### Data Requirements
+
+- nameOrig
+- amount
+
+### Analytical Definitions
+
+- Dimension: Sender activity segment
+- Account identifier: nameOrig
+- One-time sender: Exactly one transaction
+- Repeat sender: More than one transaction
+
+### Metrics
+
+1. Distinct sender identifiers
+2. Transaction count
+3. Total transaction amount
+4. Transaction volume share (%)
+5. Monetary value share (%)
+
+### Metric Calculations
+
+Transaction Count = COUNT(*)
+
+Total Transaction Amount = SUM(amount)
+
+Transaction Volume Share (%) =
+(Segment Transaction Count / Total Transaction Count) * 100
+
+Monetary Value Share (%) =
+(Segment Total Transaction Amount / Overall Transaction Amount) * 100
+
+### SQL Concepts
+
+- GROUP BY
+- COUNT
+- SUM
+- HAVING
+- CASE WHEN
+- CTEs
+- Window functions
+- Percentage calculations
+
+### Limitations
+
+Sender identifiers represent simulated account
+identifiers and should not automatically be interpreted
+as unique human customers.
+
+High transaction frequency or monetary value
+does not independently establish suspicious
+or fraudulent behaviour.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
