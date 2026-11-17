@@ -168,3 +168,64 @@ activity rather than actual payment-platform activity.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q4. Ranking Transaction Activity
+
+### Business Question
+
+Which simulation steps rank highest by transaction
+count, using total transaction value as a tie-breaker?
+
+### Objective
+
+Identify simulation steps with the highest transaction
+activity and prioritise them using a consistent
+ranking methodology.
+
+### Data Requirements
+
+- step
+- amount
+
+### Analytical Definitions
+
+- Dimension: Simulation step
+- Primary metric: Transaction count
+- Secondary metric: Total transaction value
+
+### Ranking Rules
+
+1. Higher transaction count receives priority.
+2. If transaction counts tie, higher total
+   transaction value receives priority.
+3. If both metrics tie, lower simulation step
+   receives priority for deterministic ordering.
+
+### Metric Calculation
+
+Transaction Count = COUNT(*)
+
+Total Transaction Value = SUM(amount)
+
+### SQL Concepts
+
+- GROUP BY
+- COUNT
+- SUM
+- ROW_NUMBER
+- Window functions
+- ORDER BY
+
+### Limitations
+
+The step column represents an hourly simulation
+index rather than an actual calendar timestamp.
+
+The ranking describes simulated transaction
+activity and should not be interpreted as
+real-world payment demand.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
