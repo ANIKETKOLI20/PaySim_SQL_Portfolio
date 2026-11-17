@@ -575,3 +575,74 @@ and not independently verified real-world fraud.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q10. Balance Movement Analysis
+
+### Business Question
+
+How do sender and recipient balance movements differ
+across transaction categories and fraud labels?
+
+### Objective
+
+Investigate transaction-related balance movements
+and understand differences across transaction types
+and simulated fraud classifications.
+
+### Data Requirements
+
+- type
+- amount
+- isFraud
+- nameDest
+- oldbalanceOrg
+- newbalanceOrig
+- oldbalanceDest
+- newbalanceDest
+
+### Analytical Definitions
+
+- Primary dimension: Transaction type
+- Secondary dimension: Fraud label
+- Sender balance movement:
+  newbalanceOrig - oldbalanceOrg
+- Recipient balance movement:
+  newbalanceDest - oldbalanceDest
+
+### Analytical Comparisons
+
+- Sender balance movement against expected movement.
+- Recipient balance movement against expected movement.
+- Balance movement differences by transaction type.
+- Balance movement differences by fraud label.
+
+### SQL Concepts
+
+- Arithmetic expressions
+- CASE WHEN
+- CTEs
+- GROUP BY
+- Conditional aggregation
+- Aggregate functions
+
+### Limitations
+
+Different transaction categories may have
+different balance movement expectations.
+
+A single universal balance equation must not
+be applied to all transaction categories.
+
+Merchant destination balance information is
+unavailable and must be excluded from recipient
+balance reconciliation.
+
+Balance discrepancies do not automatically
+establish data corruption or fraudulent behaviour.
+
+Existing fraud classifications are simulated labels.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
