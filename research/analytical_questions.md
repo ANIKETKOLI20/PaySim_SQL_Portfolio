@@ -229,3 +229,62 @@ real-world payment demand.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q5. Fraud-Labelled Transaction Analysis
+
+### Business Question
+
+Which transaction categories contain the highest
+number and percentage of fraud-labelled transactions?
+
+### Objective
+
+Understand how simulated fraud-labelled transactions
+are distributed across transaction categories.
+
+### Data Requirements
+
+- type
+- isFraud
+
+### Analytical Definitions
+
+- Dimension: Transaction type
+- Metric 1: Fraud-labelled transaction count
+- Metric 2: Within-category fraud-label rate
+- Metric 3: Share of all fraud-labelled transactions
+
+### Metric Calculations
+
+Fraud-labelled Transaction Count =
+COUNT of records where isFraud = 1
+
+Within-Category Fraud-Label Rate (%) =
+(Fraud-labelled transactions in category /
+Total transactions in category) * 100
+
+Share of All Fraud-Labelled Transactions (%) =
+(Fraud-labelled transactions in category /
+Total fraud-labelled transactions) * 100
+
+### SQL Concepts
+
+- COUNT
+- GROUP BY
+- CASE WHEN
+- Conditional aggregation
+- CTEs
+- Percentage calculation
+
+### Limitations
+
+The isFraud column contains existing simulated
+fraud labels, not independently verified real-world fraud.
+
+The analysis describes simulated fraud-label patterns
+and should not be interpreted as actual UPI fraud rates.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
