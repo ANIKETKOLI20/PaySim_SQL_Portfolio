@@ -503,3 +503,75 @@ unavailable in the dataset.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q9. Transaction Amount Distribution Analysis
+
+### Business Question
+
+How does the distribution of transaction amounts
+differ across transaction categories and fraud labels?
+
+### Objective
+
+Understand transaction amount characteristics
+and identify differences between transaction
+categories and fraud-labelled groups.
+
+### Data Requirements
+
+- type
+- amount
+- isFraud
+
+### Analytical Definitions
+
+- Primary dimension: Transaction type
+- Secondary dimension: Fraud label
+- Metric 1: Transaction count
+- Metric 2: Average transaction amount
+- Metric 3: Median transaction amount
+- Metric 4: Minimum transaction amount
+- Metric 5: Maximum transaction amount
+
+### Metric Calculations
+
+Transaction Count = COUNT(*)
+
+Average Amount = AVG(amount)
+
+Median Amount = PERCENTILE_CONT(0.5)
+WITHIN GROUP (ORDER BY amount)
+
+Minimum Amount = MIN(amount)
+
+Maximum Amount = MAX(amount)
+
+### SQL Concepts
+
+- COUNT
+- AVG
+- MEDIAN calculation
+- MIN
+- MAX
+- GROUP BY
+- CASE WHEN
+- Conditional aggregation
+
+### Limitations
+
+The analysis uses simulated mobile-money
+transaction amounts.
+
+Average values may be influenced by
+extremely large transactions.
+
+Median values provide additional context
+about the middle of the transaction distribution.
+
+Existing fraud labels are simulated labels
+and not independently verified real-world fraud.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
