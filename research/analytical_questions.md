@@ -288,3 +288,68 @@ and should not be interpreted as actual UPI fraud rates.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q6. Fraud Flag vs Fraud Label Analysis
+
+### Business Question
+
+How closely do the existing rule-based flags correspond
+to the simulated fraud labels?
+
+### Objective
+
+Evaluate the relationship between the existing
+fraud labels and the rule-based flagging mechanism.
+
+### Data Requirements
+
+- isFraud
+- isFlaggedFraud
+- type
+- amount
+
+### Analytical Definitions
+
+Reference Label: isFraud
+
+Rule-Based Prediction: isFlaggedFraud
+
+### Confusion Matrix Metrics
+
+- True Positives (TP): Fraud-labelled and flagged.
+- False Positives (FP): Not fraud-labelled but flagged.
+- False Negatives (FN): Fraud-labelled but not flagged.
+- True Negatives (TN): Neither fraud-labelled nor flagged.
+
+### Performance Metrics
+
+Precision = TP / (TP + FP)
+
+Recall = TP / (TP + FN)
+
+False Positive Rate = FP / (FP + TN)
+
+### SQL Concepts
+
+- CASE WHEN
+- Conditional aggregation
+- COUNT
+- GROUP BY
+- CTEs
+- Percentage calculations
+
+### Limitations
+
+The isFraud column represents existing simulated
+fraud labels, not independently verified real-world fraud.
+
+The isFlaggedFraud column represents a specific
+rule-based flagging mechanism.
+
+The analysis evaluates agreement with simulated labels,
+not the performance of a production fraud detection system.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
