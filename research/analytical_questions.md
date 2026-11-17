@@ -61,3 +61,53 @@ volume or real-world market demand.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q2. Transaction Monetary Analysis
+
+### Business Question
+
+Which transaction category has the highest total
+and average transaction amount?
+
+### Objective
+
+Compare the aggregate monetary value and
+average transaction size across transaction categories.
+
+### Data Requirements
+
+- type
+- amount
+
+### Analytical Definitions
+
+- Dimension: Transaction type
+- Metric 1: Total transaction value
+- Metric 2: Average transaction value
+
+### Metric Calculation
+
+Total Transaction Value = SUM(amount)
+
+Average Transaction Value =
+SUM(amount) / COUNT(*)
+
+### SQL Concepts
+
+- SUM
+- AVG
+- GROUP BY
+- ORDER BY
+
+### Limitations
+
+Transaction value represents simulated monetary
+activity, not platform revenue or profit.
+
+The dataset contains synthetic mobile-money
+transactions, not actual UPI payment records.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
