@@ -111,3 +111,60 @@ transactions, not actual UPI payment records.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q3. Hourly Transaction Trends
+
+### Business Question
+
+How do transaction counts and total transaction
+values change across simulation steps?
+
+### Objective
+
+Understand changes in simulated transaction
+activity over time and identify high-activity
+and low-activity simulation steps.
+
+### Data Requirements
+
+- step
+- type
+- amount
+
+### Analytical Definitions
+
+- Dimension: Simulation step
+- Additional dimension: Transaction type
+- Metric 1: Transaction count
+- Metric 2: Total transaction value
+
+### Metric Calculation
+
+Transaction Count = COUNT(*)
+
+Total Transaction Value = SUM(amount)
+
+### SQL Concepts
+
+- GROUP BY
+- COUNT
+- SUM
+- ORDER BY
+- CASE WHEN
+- Window functions
+
+### Limitations
+
+The step column represents an hourly simulation
+index rather than an actual calendar timestamp.
+
+The analysis cannot reliably establish calendar
+dates, weekdays or real-world time-of-day patterns.
+
+The results describe simulated transaction
+activity rather than actual payment-platform activity.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
