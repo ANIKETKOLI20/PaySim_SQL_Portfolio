@@ -426,3 +426,80 @@ or fraudulent behaviour.
 ### Results and Interpretation
 
 To be completed after SQL implementation.
+
+
+## Q8. Recipient Transaction Concentration
+
+### Business Question
+
+Which recipient identifiers receive the highest
+transaction counts and monetary values, and how
+does recipient activity differ between customer
+and merchant identifiers?
+
+### Objective
+
+Understand transaction concentration across
+customer and merchant receiving accounts.
+
+### Data Requirements
+
+- nameDest
+- amount
+- type
+- isFraud
+
+### Analytical Definitions
+
+- Primary dimension: Recipient type
+- Recipient identifier: nameDest
+- Customer identifier: Starts with C
+- Merchant identifier: Starts with M
+
+### Metrics
+
+1. Distinct recipient identifiers
+2. Transaction count
+3. Total transaction value
+4. Average transaction value
+5. Share of total transaction value
+
+### Metric Calculations
+
+Transaction Count = COUNT(*)
+
+Total Transaction Value = SUM(amount)
+
+Average Transaction Value = AVG(amount)
+
+Transaction Value Share (%) =
+(Segment Transaction Value / Overall Transaction Value) * 100
+
+### SQL Concepts
+
+- CASE WHEN
+- GROUP BY
+- COUNT
+- SUM
+- AVG
+- CTEs
+- Window functions
+- Percentage calculations
+
+### Limitations
+
+Recipient identifiers represent simulated account
+identifiers, not verified human identities.
+
+Merchant and customer receiving activities
+should be analysed separately.
+
+Transaction value does not represent platform
+revenue or profit.
+
+Merchant destination balance information is
+unavailable in the dataset.
+
+### Results and Interpretation
+
+To be completed after SQL implementation.
