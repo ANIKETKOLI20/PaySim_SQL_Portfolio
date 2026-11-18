@@ -302,9 +302,6 @@ dates, weekdays or real-world time-of-day patterns.
 The results describe simulated transaction
 activity rather than actual payment-platform activity.
 
-### Results and Interpretation
-
-To be completed after SQL implementation.
 
 
 ## Q4. Ranking Transaction Activity
@@ -354,6 +351,80 @@ Total Transaction Value = SUM(amount)
 - Window functions
 - ORDER BY
 
+
+### Results and Interpretation
+
+#### Ranking Methodology
+
+Simulation steps were ranked using the following
+criteria:
+
+1. Transaction count — descending.
+2. Total transaction value — descending.
+3. Simulation step — ascending.
+
+ROW_NUMBER() was used to assign a unique ranking
+position to each simulation step.
+
+#### Actual Query Results — Top 5
+
+| Rank | Step | Transaction Count | Total Transaction Value |
+|---:|---:|---:|---:|
+| 1 | 19 | 51,352 | 71,038,465,529.97 |
+| 2 | 18 | 49,579 | 72,550,715,178.26 |
+| 3 | 187 | 49,083 | 73,912,594,959.56 |
+| 4 | 235 | 47,491 | 72,981,450,078.92 |
+| 5 | 307 | 46,968 | 85,120,050,039.48 |
+
+#### Key Findings
+
+1. Simulation Step 19 ranks first with 51,352
+   transactions, representing the highest observed
+   transaction count among all simulation steps.
+
+2. Step 18 ranks second with 49,579 transactions.
+
+3. Step 307 has the highest total transaction value
+   among the displayed top five steps, but ranks fifth
+   because transaction count is the primary ranking
+   criterion.
+
+4. Transaction frequency and total transaction value
+   do not necessarily produce the same ranking.
+
+#### Validation
+
+| Validation Metric | Actual Result |
+|---|---:|
+| Total ranked simulation steps | 743 |
+| Unique ranking positions | 743 |
+| First ranking position | 1 |
+| Last ranking position | 743 |
+
+All 743 observed simulation steps received a unique
+ranking position.
+
+#### Interpretation
+
+The ranking demonstrates that the simulation step
+with the highest transaction count does not
+necessarily have the highest monetary value.
+
+Step 19 ranks first because transaction frequency
+is the primary ranking criterion.
+
+Step 307 generates a higher total transaction value
+than Step 19 but ranks fifth because its transaction
+count is lower.
+
+This illustrates the importance of defining ranking
+criteria according to the analytical objective.
+
+The results describe simulated hourly transaction
+activity and should not be interpreted as evidence
+of fraud, suspicious behaviour or real-world payment
+performance.
+
 ### Limitations
 
 The step column represents an hourly simulation
@@ -362,10 +433,6 @@ index rather than an actual calendar timestamp.
 The ranking describes simulated transaction
 activity and should not be interpreted as
 real-world payment demand.
-
-### Results and Interpretation
-
-To be completed after SQL implementation.
 
 
 ## Q5. Fraud-Labelled Transaction Analysis
