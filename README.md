@@ -125,26 +125,34 @@ Additional observations:
 
 Detailed investigation results and limitations are documented in `research/data_quality_findings.md`.
 
+
 ### Phase 3 — Analytical Question Discovery
 
 **Status: Completed**
 
-Developed and validated ten analytical questions based on the actual dataset structure and available columns.
+Developed and validated ten analytical questions
+based on the PaySim dataset structure and
+available transaction fields.
 
-| No. | Analytical Question | Primary SQL Concepts |
-|---|---|---|
-| Q1 | Transaction volume distribution | COUNT, GROUP BY, percentage calculations |
-| Q2 | Transaction monetary analysis | SUM, AVG, GROUP BY |
-| Q3 | Hourly transaction trends | GROUP BY, COUNT, SUM |
-| Q4 | Ranking transaction activity | ROW_NUMBER, window functions |
-| Q5 | Fraud-labelled transaction analysis | CASE WHEN, conditional aggregation |
-| Q6 | Fraud flag versus fraud label analysis | CTEs, conditional aggregation, confusion matrix |
-| Q7 | Sender activity distribution | GROUP BY, HAVING, SUM, COUNT |
-| Q8 | Recipient transaction concentration | CASE WHEN, aggregation, window functions |
-| Q9 | Transaction amount distribution | AVG, median, MIN, MAX |
-| Q10 | Balance movement analysis | Arithmetic expressions, CASE WHEN, CTEs |
+The questions cover:
 
-Detailed question specifications are maintained in `research/analytical_questions.md`.
+- Transaction volume and monetary analysis.
+- Hourly transaction trends and ranking.
+- Fraud-label and rule-based flag analysis.
+- Sender activity distribution.
+- Recipient transaction concentration.
+- Transaction amount distribution.
+- Sender and recipient balance movement analysis.
+
+**Documentation:**
+
+- [Analytical Questions Overview](research/analytical_questions_overview.md)
+- [Detailed Analytical Specifications](research/analytical_questions.md)
+
+All ten questions have been reviewed and approved.
+PostgreSQL implementation and analytical results
+are pending.
+
 
 ### Phase 4 — PostgreSQL Setup and SQL Implementation
 
@@ -177,14 +185,6 @@ PostgreSQL is the primary database platform for the analytical queries.
 - Publish analytical results and validation evidence.
 - Prepare a LinkedIn project showcase.
 
-### Phase 7 — Interview Readiness
-
-**Status: Planned**
-
-- Explain query logic and SQL concepts.
-- Justify analytical decisions and metric definitions.
-- Discuss data-quality findings and limitations.
-- Solve variations of the analytical questions independently.
 
 ## Technology Stack
 
@@ -209,6 +209,7 @@ PaySim_SQL_Portfolio/
 │
 ├── research/
 │   ├── dataset_source_notes.md
+    ├── analytical_questions_overview.md
 │   ├── data_quality_findings.md
 │   ├── analytical_questions.md
 │   ├── missing_value_audit.csv
