@@ -130,6 +130,57 @@ SUM(amount) / COUNT(*)
 - GROUP BY
 - ORDER BY
 
+
+### Results and Interpretation
+
+#### Actual Query Results
+
+| Transaction Type | Transaction Count | Total Transaction Value | Average Transaction Amount |
+|---|---:|---:|---:|
+| TRANSFER | 532,909 | 485,291,987,263.17 | 910,647.01 |
+| CASH_OUT | 2,237,500 | 394,412,995,224.49 | 176,273.96 |
+| CASH_IN | 1,399,284 | 236,367,391,912.46 | 168,920.24 |
+| PAYMENT | 2,151,495 | 28,093,371,138.37 | 13,057.60 |
+| DEBIT | 41,432 | 227,199,221.28 | 5,483.67 |
+
+#### Key Findings
+
+1. TRANSFER has the highest total transaction
+   value, accounting for the largest monetary
+   contribution among the five categories.
+
+2. TRANSFER also has the highest average
+   transaction amount.
+
+3. CASH_OUT has the highest transaction count
+   but ranks second in total transaction value.
+
+4. PAYMENT has substantial transaction volume
+   but comparatively low average transaction value.
+
+#### Validation
+
+- Category transaction counts match the
+  previously validated Python audit.
+- Category monetary totals sum to the overall
+  transaction value of 1,144,392,944,759.77.
+- Average amounts are calculated using the
+  number of transactions in each category.
+
+#### Interpretation
+
+Transaction volume and monetary value exhibit
+different patterns across transaction categories.
+
+TRANSFER contributes the highest total
+transaction value despite having considerably
+fewer transactions than CASH_OUT and PAYMENT.
+
+The findings describe simulated monetary activity
+and must not be interpreted as platform revenue,
+profit or actual UPI payment behaviour.
+
+
 ### Limitations
 
 Transaction value represents simulated monetary
@@ -137,10 +188,6 @@ activity, not platform revenue or profit.
 
 The dataset contains synthetic mobile-money
 transactions, not actual UPI payment records.
-
-### Results and Interpretation
-
-To be completed after SQL implementation.
 
 
 ## Q3. Hourly Transaction Trends
