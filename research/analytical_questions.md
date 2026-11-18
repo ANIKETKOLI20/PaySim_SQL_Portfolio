@@ -42,25 +42,55 @@ Transaction Share (%) =
 - Window functions
 - Percentage calculation
 
-### Expected Output
+### Results and Interpretation
+
+#### Actual Query Results
 
 | Transaction Type | Transaction Count | Transaction Share (%) |
 |---|---:|---:|
-| CASH_OUT | To be calculated | To be calculated |
-| PAYMENT | To be calculated | To be calculated |
-| CASH_IN | To be calculated | To be calculated |
-| TRANSFER | To be calculated | To be calculated |
-| DEBIT | To be calculated | To be calculated |
+| CASH_OUT | 2,237,500 | 35.17 |
+| PAYMENT | 2,151,495 | 33.81 |
+| CASH_IN | 1,399,284 | 21.99 |
+| TRANSFER | 532,909 | 8.38 |
+| DEBIT | 41,432 | 0.65 |
+| **Total** | **6,362,620** | **100.00** |
+
+#### Key Findings
+
+1. CASH_OUT represents the highest transaction
+   volume, accounting for 35.17% of all records.
+
+2. PAYMENT represents the second-highest
+   transaction volume at 33.81%.
+
+3. CASH_OUT and PAYMENT together account for
+   68.98% of total transaction records.
+
+4. DEBIT represents the lowest transaction
+   volume at 0.65%.
+
+#### Validation
+
+- Total category transaction counts match the
+  imported PostgreSQL record count.
+- Category counts reconcile with the earlier
+  Python transaction category audit.
+- Transaction share percentages sum to 100%.
+
+#### Interpretation
+
+CASH_OUT and PAYMENT account for the largest
+proportions of simulated transaction activity.
+
+The findings describe transaction frequency
+and do not establish which category contributes
+the highest monetary value or platform revenue.
 
 ### Limitations
 
 The analysis describes simulated mobile-money
 transaction activity, not actual UPI transaction
 volume or real-world market demand.
-
-### Results and Interpretation
-
-To be completed after SQL implementation.
 
 
 ## Q2. Transaction Monetary Analysis
