@@ -36,6 +36,7 @@ stats = {
 }
 
 total_records = 0
+total_amount = Decimal("0")
 
 
 # 4. Read the entire CSV
@@ -75,6 +76,9 @@ with file_path.open(
                 stats[column]["invalid_count"] += 1
                 continue
 
+            if column == "amount":
+                total_amount += value
+
             # Determine decimal places from exact input value
             decimal_places = max(
                 0, -value.as_tuple().exponent
@@ -101,6 +105,8 @@ with file_path.open(
                 stats[column]["max_absolute_value"],
                 abs(value)
             )
+
+        
 
 
 # 5. Display actual results
@@ -129,3 +135,6 @@ for column, result in stats.items():
 
     print(f"Blank values: {result['blank_count']}")
     print(f"Invalid values: {result['invalid_count']}")
+
+    print("\n--- SOURCE DATA MONETARY TOTAL ---")
+    print(f"Total transaction value: {total_amount}")
