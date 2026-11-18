@@ -231,6 +231,66 @@ Total Transaction Value = SUM(amount)
 - CASE WHEN
 - Window functions
 
+
+### Results and Interpretation
+
+#### Actual Query Results — Selected Simulation Steps
+
+| Step | Transaction Count | Total Transaction Value |
+|---:|---:|---:|
+| 1 | 2,708 | 285,429,181.15 |
+| 2 | 1,014 | 85,921,604.02 |
+| 3 | 552 | 43,293,884.42 |
+| 4 | 565 | 72,910,028.57 |
+| 5 | 665 | 45,548,089.75 |
+| 739 | 10 | 16,587,831.36 |
+| 740 | 6 | 7,632,963.58 |
+| 741 | 22 | 87,828,992.99 |
+| 742 | 14 | 14,323,735.20 |
+| 743 | 8 | 17,519,825.50 |
+
+#### Key Findings
+
+1. Transaction counts and total transaction
+   values vary across simulation steps.
+
+2. Transaction frequency and monetary value
+   do not necessarily move together.
+
+3. Step 743 records a higher total transaction
+   value than Step 739 despite having fewer
+   transactions.
+
+4. The average transaction amount at Step 743
+   is approximately 2,189,978.19, compared with
+   1,658,783.14 at Step 739.
+
+#### Validation
+
+- First observed step: 1
+- Last observed step: 743
+- Distinct observed steps: 743
+- Hourly aggregation output rows: 743
+- No missing simulation steps within the
+  observed range of 1–743.
+
+#### Interpretation
+
+Transaction frequency and monetary value show
+different patterns across simulation steps.
+
+A smaller number of transactions can generate
+a higher total transaction value when the
+average transaction amount is higher.
+
+A high average transaction amount alone does
+not establish suspicious activity or fraud.
+
+The analysis describes simulated hourly
+transaction activity, not actual calendar-hour
+payment behaviour.
+
+
 ### Limitations
 
 The step column represents an hourly simulation

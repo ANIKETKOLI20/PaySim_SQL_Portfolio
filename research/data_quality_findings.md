@@ -495,3 +495,42 @@ these investigations.
 9. Findings from the simulated data should not
    automatically be generalised to real-world
    mobile-money or UPI platforms.
+
+
+## Simulation Step Coverage
+
+### Published Dataset Description
+
+The published PaySim dataset description
+refers to 744 hourly simulation steps.
+
+### Actual CSV Investigation
+
+| Metric | Observed Result |
+|---|---:|
+| Minimum step | 1 |
+| Maximum step | 743 |
+| Distinct steps | 743 |
+| Grouped hourly records | 743 |
+
+### Finding
+
+The actual CSV contains populated simulation
+steps from 1 through 743.
+
+All 743 steps within this observed range
+are represented.
+
+The published description refers to 744 steps,
+while the actual CSV contains 743 distinct
+populated step values.
+
+### Limitation
+
+The reason for this discrepancy has not been
+established.
+
+The original dataset was not modified to
+introduce an additional simulation step.
+
+All analysis uses the actual observed records.
