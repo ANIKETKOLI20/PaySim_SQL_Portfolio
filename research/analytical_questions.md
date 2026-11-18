@@ -481,6 +481,80 @@ Total fraud-labelled transactions) * 100
 - CTEs
 - Percentage calculation
 
+
+### Results and Interpretation
+
+#### Actual Query Results
+
+| Transaction Type | Total Transactions | Fraud-Labelled Count | Category Fraud-Label Rate (%) | Fraud-Label Concentration (%) |
+|---|---:|---:|---:|---:|
+| CASH_OUT | 2,237,500 | 4,116 | 0.18 | 50.12 |
+| TRANSFER | 532,909 | 4,097 | 0.77 | 49.88 |
+| CASH_IN | 1,399,284 | 0 | 0.00 | 0.00 |
+| DEBIT | 41,432 | 0 | 0.00 | 0.00 |
+| PAYMENT | 2,151,495 | 0 | 0.00 | 0.00 |
+| **Total** | **6,362,620** | **8,213** | — | **100.00** |
+
+#### Key Findings
+
+1. CASH_OUT contains the highest number of
+   fraud-labelled transactions, with 4,116 records.
+
+2. TRANSFER contains 4,097 fraud-labelled
+   transactions, only 19 fewer than CASH_OUT.
+
+3. TRANSFER has the highest category fraud-label
+   rate at 0.77%, compared with 0.18% for CASH_OUT.
+
+4. CASH_OUT contributes 50.12% of all
+   fraud-labelled transactions, while TRANSFER
+   contributes 49.88%.
+
+5. CASH_IN, DEBIT and PAYMENT contain no
+   fraud-labelled transactions in this dataset.
+
+#### Validation
+
+- Total transactions: 6,362,620.
+- Total fraud-labelled transactions: 8,213.
+- CASH_OUT and TRANSFER account for all
+  8,213 fraud-labelled transactions.
+- Category fraud-label rates use total transactions
+  within each respective category as the denominator.
+- Fraud-label concentration uses all fraud-labelled
+  transactions as the denominator.
+- Fraud-label concentration percentages sum to 100%.
+
+#### Interpretation
+
+The distribution of fraud-labelled transactions
+shows a difference between fraud-label count and
+category fraud-label rate.
+
+CASH_OUT has the highest fraud-labelled transaction
+count because it contains 4,116 such records.
+
+However, TRANSFER has a higher category fraud-label
+rate because its fraud-labelled transaction count
+is distributed across a considerably smaller
+transaction population.
+
+TRANSFER's category fraud-label rate is approximately
+4.2 times that of CASH_OUT.
+
+The concentration analysis also shows that
+fraud-labelled transactions are distributed almost
+equally between CASH_OUT and TRANSFER.
+
+These findings demonstrate why transaction counts,
+category-level rates and fraud-label concentration
+must be evaluated separately.
+
+The analysis describes simulated fraud labels and
+does not establish independently confirmed fraud
+or actual production payment-platform behaviour.
+
+
 ### Limitations
 
 The isFraud column contains existing simulated
@@ -488,10 +562,6 @@ fraud labels, not independently verified real-world fraud.
 
 The analysis describes simulated fraud-label patterns
 and should not be interpreted as actual UPI fraud rates.
-
-### Results and Interpretation
-
-To be completed after SQL implementation.
 
 
 ## Q6. Fraud Flag vs Fraud Label Analysis
