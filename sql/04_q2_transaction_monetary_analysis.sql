@@ -19,3 +19,4 @@ SELECT
     average_amount
 FROM aggegrate_counts
 ORDER BY total_amount DESC, average_amount DESC;
+
