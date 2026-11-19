@@ -928,23 +928,111 @@ Transaction Value Share (%) =
 - Window functions
 - Percentage calculations
 
-### Limitations
-
-Recipient identifiers represent simulated account
-identifiers, not verified human identities.
-
-Merchant and customer receiving activities
-should be analysed separately.
-
-Transaction value does not represent platform
-revenue or profit.
-
-Merchant destination balance information is
-unavailable in the dataset.
 
 ### Results and Interpretation
 
-To be completed after SQL implementation.
+#### Actual Query Results — Top 10 Recipient IDs
+
+| Rank | Recipient ID | Transaction Count | Total Received Value | Average Received Amount | Transaction Share (%) | Monetary Value Share (%) |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | C1286084959 | 113 | 77,428,943.31 | 685,211.89 | 0.00178 | 0.00677 |
+| 2 | C985934102 | 109 | 42,422,887.98 | 389,200.81 | 0.00171 | 0.00371 |
+| 3 | C665576141 | 105 | 88,749,384.38 | 845,232.23 | 0.00165 | 0.00776 |
+| 4 | C2083562754 | 102 | 53,073,938.76 | 520,332.73 | 0.00160 | 0.00464 |
+| 5 | C1590550415 | 101 | 43,206,101.59 | 427,783.18 | 0.00159 | 0.00378 |
+| 6 | C2486099774 | 101 | 40,680,160.99 | 402,773.87 | 0.00159 | 0.00355 |
+| 7 | C1789550256 | 99 | 177,885,264.60 | 1,796,820.85 | 0.00156 | 0.01554 |
+| 8 | C4511111351 | 99 | 37,453,031.39 | 378,313.45 | 0.00156 | 0.00327 |
+| 9 | C1360767589 | 98 | 35,121,289.27 | 358,380.50 | 0.00154 | 0.00307 |
+| 10 | C1023714065 | 97 | 42,402,918.40 | 437,143.49 | 0.00152 | 0.00371 |
+
+#### Recipient Population Summary
+
+| Validation Metric | Actual Result |
+|---|---:|
+| Total recipient groups | 2,722,362 |
+| Distinct recipient IDs | 2,722,362 |
+| Total transaction records | 6,362,620 |
+| Total recorded transaction value | 1,144,392,944,759.77 |
+
+#### Top-Ten Concentration Summary
+
+| Metric | Top-Ten Result |
+|---|---:|
+| Combined transaction count | 1,024 |
+| Combined transaction value | 638,423,920.67 |
+| Combined transaction share | 0.01609% |
+| Combined monetary value share | 0.05579% |
+
+#### Key Findings
+
+1. The dataset contains 2,722,362 distinct
+   recipient identifiers.
+
+2. Recipient C1286084959 ranks first with
+   113 incoming transactions.
+
+3. Recipient C1789550256 has the highest
+   total received value among the top ten,
+   despite ranking seventh by transaction count.
+
+4. The top ten recipients account for 1,024
+   transactions, representing approximately
+   0.01609% of all transaction records.
+
+5. The top ten recipients account for
+   638,423,920.67 in recorded transaction value,
+   representing approximately 0.05579% of
+   the overall monetary value.
+
+6. Transaction frequency and monetary contribution
+   produce different recipient rankings.
+
+#### Validation
+
+The independent validation query confirmed:
+
+- Recipient groups: 2,722,362.
+- Distinct recipient IDs: 2,722,362.
+- Reconciled transaction records: 6,362,620.
+- Reconciled monetary value: 1,144,392,944,759.77.
+- Transaction share reconciliation: 100.00000%.
+- Monetary value share reconciliation: 100.00000%.
+- Top-ten records: 10.
+- Ranking-order violations: 0.
+
+All seven validation checks returned TRUE.
+
+#### Interpretation
+
+The recipient-level analysis demonstrates that incoming
+transaction frequency and monetary contribution
+must be evaluated independently.
+
+Recipient C1286084959 has the highest transaction
+frequency among the top ten, while C1789550256
+has the highest monetary contribution.
+
+The concentration analysis also demonstrates
+that the ten highest-ranked recipient IDs account
+for a relatively small share of overall transaction
+volume and monetary value.
+
+This illustrates why analysing only the highest-ranked
+recipient accounts does not fully describe the
+distribution of incoming transaction activity.
+
+#### Limitations
+
+- Recipient identifiers represent destination
+  identifiers, not necessarily individual customers.
+- The analysis does not establish whether a
+  recipient represents a merchant or an individual.
+- Total received value represents recorded
+  transaction value, not revenue or profit.
+- The findings describe simulated mobile-money
+  transaction activity and should not be interpreted
+  as actual production payment-platform behaviour.
 
 
 ## Q9. Transaction Amount Distribution Analysis

@@ -11,7 +11,6 @@ WITH category_counts AS (
         COUNT(*) AS transaction_count
 
     FROM public.transactions
-
     GROUP BY transaction_type
 
 )
