@@ -753,25 +753,121 @@ Monetary Value Share (%) =
 - GROUP BY
 - COUNT
 - SUM
-- HAVING
 - CASE WHEN
 - CTEs
 - Window functions
-- Percentage calculations
-
-### Limitations
-
-Sender identifiers represent simulated account
-identifiers and should not automatically be interpreted
-as unique human customers.
-
-High transaction frequency or monetary value
-does not independently establish suspicious
-or fraudulent behaviour.
 
 ### Results and Interpretation
 
-To be completed after SQL implementation.
+#### Actual Query Results — Top 10 Sender Accounts
+
+| Rank | Sender ID | Transaction Count | Total Transaction Value | Average Transaction Amount |
+|---:|---|---:|---:|---:|
+| 1 | C545315117 | 3 | 2,485,461.64 | 828,487.21 |
+| 2 | C724452879 | 3 | 838,815.30 | 279,605.10 |
+| 3 | C1902386530 | 3 | 763,712.79 | 254,570.93 |
+| 4 | C1976208114 | 3 | 511,130.35 | 170,376.78 |
+| 5 | C1530544995 | 3 | 490,535.09 | 163,511.70 |
+| 6 | C1784010646 | 3 | 436,700.25 | 145,566.75 |
+| 7 | C2098525306 | 3 | 378,102.22 | 126,034.07 |
+| 8 | C1832548028 | 3 | 313,665.83 | 104,555.28 |
+| 9 | C1999539787 | 3 | 290,555.01 | 96,851.67 |
+| 10 | C1677795071 | 3 | 244,735.38 | 81,578.46 |
+
+#### Sender Activity Distribution
+
+| Metric | Actual Result |
+|---|---:|
+| Total distinct sender accounts | 6,353,307 |
+| Single-transaction sender accounts | 6,344,009 |
+| Repeat sender accounts | 9,298 |
+| Maximum transactions per sender | 3 |
+| Single-transaction sender share | 99.85% |
+| Repeat sender account share | 0.15% |
+
+#### Key Findings
+
+1. The dataset contains 6,353,307 distinct
+   originating sender accounts.
+
+2. Approximately 99.85% of sender accounts
+   appear in only one transaction.
+
+3. Only 9,298 sender accounts perform more
+   than one transaction.
+
+4. No sender account performs more than
+   three transactions in the dataset.
+
+5. All ten highest-ranked sender accounts
+   have exactly three transactions.
+
+6. Since the top ten accounts have identical
+   transaction counts, total transaction value
+   determines their ranking.
+
+7. Sender C545315117 has the highest total
+   transaction value among the top ten accounts,
+   contributing 2,485,461.64 across three
+   transactions.
+
+#### Validation
+
+| Validation Metric | Actual Result |
+|---|---:|
+| Sender groups | 6,353,307 |
+| Distinct sender accounts | 6,353,307 |
+| Reconciled transaction count | 6,362,620 |
+| Top-ten result rows | 10 |
+| First ranking position | 1 |
+| Last ranking position | 10 |
+| Maximum transactions per sender | 3 |
+
+All sender groups and transaction records
+reconciled successfully.
+
+All three validation checks returned TRUE:
+sender group reconciliation, transaction count
+reconciliation and top-ten reconciliation.
+
+#### Interpretation
+
+The sender-level analysis reveals that transaction
+activity is highly dispersed across originating
+accounts.
+
+Almost all sender accounts appear in only one
+transaction, while a very small proportion
+perform repeat transactions.
+
+The maximum observed transaction frequency
+for a sender account is three.
+
+The top-ten results also demonstrate that
+transaction frequency and monetary contribution
+provide different perspectives on sender activity.
+
+Because all ten leading accounts have identical
+transaction counts, monetary contribution
+becomes the determining ranking criterion.
+
+These findings describe the structure of
+simulated sender-account activity and should
+not be interpreted as actual customer engagement,
+customer retention or real-world banking behaviour.
+
+#### Limitations
+
+- Sender identifiers represent originating
+  accounts in the simulated dataset, not
+  independently verified individual customers.
+- Transaction frequency does not establish
+  customer engagement or relationship quality.
+- Monetary contribution represents the sum
+  of recorded transaction amounts, not revenue.
+- The results are specific to the supplied
+  synthetic dataset.
+
 
 
 ## Q8. Recipient Transaction Concentration
