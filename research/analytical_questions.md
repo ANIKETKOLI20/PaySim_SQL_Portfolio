@@ -613,20 +613,92 @@ False Positive Rate = FP / (FP + TN)
 - CTEs
 - Percentage calculations
 
-### Limitations
-
-The isFraud column represents existing simulated
-fraud labels, not independently verified real-world fraud.
-
-The isFlaggedFraud column represents a specific
-rule-based flagging mechanism.
-
-The analysis evaluates agreement with simulated labels,
-not the performance of a production fraud detection system.
-
 ### Results and Interpretation
 
-To be completed after SQL implementation.
+#### Actual Query Results — Confusion Matrix
+
+| Classification Outcome | Transaction Count |
+|---|---:|
+| True Positives (TP) | 16 |
+| False Positives (FP) | 0 |
+| False Negatives (FN) | 8,197 |
+| True Negatives (TN) | 6,354,407 |
+| **Total Transactions** | **6,362,620** |
+
+#### Rule Evaluation Metrics
+
+| Metric | Actual Result |
+|---|---:|
+| Precision | 100.00% |
+| Recall | 0.19% |
+
+#### Key Findings
+
+1. The existing rule flagged 16 transactions,
+   and all 16 carried the simulation's fraud label.
+
+2. No false positives were observed in the dataset.
+
+3. The rule failed to flag 8,197 fraud-labelled
+   transactions.
+
+4. The rule achieved 100% precision but only
+   0.19% recall against the simulation labels.
+
+5. Approximately 99.81% of all fraud-labelled
+   transactions were not identified by the rule.
+
+#### Validation
+
+- Total transactions: 6,362,620.
+- Total fraud-labelled transactions: 8,213.
+- Total rule-flagged transactions: 16.
+- True positives + False positives: 16.
+- True positives + False negatives: 8,213.
+- All four confusion matrix outcomes sum to
+  the total transaction count.
+
+#### Interpretation
+
+The existing rule demonstrates high precision
+but extremely low recall against the simulation's
+fraud labels.
+
+Its 100% precision indicates that every
+transaction flagged by the rule also carries
+the simulation's fraud label.
+
+However, its 0.19% recall demonstrates that
+the rule identifies only 16 out of 8,213
+fraud-labelled transactions.
+
+The remaining 8,197 fraud-labelled transactions
+were not identified by the existing rule.
+
+This demonstrates that precision alone is
+insufficient when evaluating a rule-based
+fraud detection mechanism.
+
+A rule can avoid false positives among the
+transactions it flags while still missing
+the overwhelming majority of fraud-labelled
+transactions.
+
+#### Limitations
+
+- The analysis evaluates alignment with
+  PaySim's simulated fraud labels.
+- The simulated fraud labels are treated as
+  reference classifications, not independently
+  verified real-world fraud outcomes.
+- Precision and recall describe this dataset's
+  classification results, not the effectiveness
+  of a production fraud detection system.
+
+The findings should not be interpreted as
+evidence of actual financial losses or
+real-world fraud detection performance.
+
 
 
 ## Q7. Sender Activity Distribution Analysis
