@@ -1254,23 +1254,138 @@ and simulated fraud classifications.
 - Conditional aggregation
 - Aggregate functions
 
-### Limitations
-
-Different transaction categories may have
-different balance movement expectations.
-
-A single universal balance equation must not
-be applied to all transaction categories.
-
-Merchant destination balance information is
-unavailable and must be excluded from recipient
-balance reconciliation.
-
-Balance discrepancies do not automatically
-establish data corruption or fraudulent behaviour.
-
-Existing fraud classifications are simulated labels.
 
 ### Results and Interpretation
 
-To be completed after SQL implementation.
+#### Diagnostic Results — Sender and Recipient Balance Movements
+
+##### 1. Sender Balance Reconciliation
+
+The initial strict balance movement formula produced a high number of mismatches.
+
+Further investigation identified zero-floor balance behaviour in outgoing transactions.
+
+The diagnostic compared the following formulas:
+
+Strict outgoing balance movement:
+
+New Balance = Old Balance - Transaction Amount
+
+Zero-floor outgoing balance:
+
+New Balance = GREATEST(Old Balance - Transaction Amount, 0)
+
+| Transaction Type | Evaluated Transactions | Zero-Floor Matches | Remaining Mismatches |
+|---|---:|---:|---:|
+| CASH_OUT | 2,233,384 | 2,216,411 | 16,973 |
+| DEBIT | 41,432 | 40,323 | 1,109 |
+| PAYMENT | 2,151,495 | 2,046,967 | 104,528 |
+| TRANSFER | 528,812 | 526,712 | 2,100 |
+
+Key observations:
+
+- The zero-floor formula matches most evaluated outgoing transactions.
+- CASH_OUT and TRANSFER have relatively few remaining mismatches compared with their transaction volumes.
+- PAYMENT has 104,528 remaining mismatches.
+- All remaining mismatches in the fraud-flag diagnostic had is_flagged_fraud = 0.
+- The zero-floor formula substantially improves sender-side reconciliation compared with the initial strict formula.
+
+These results provide empirical evidence of zero-floor balance behaviour in the dataset. Remaining mismatches require separate investigation and should not automatically be classified as data errors.
+
+##### 2. CASH_IN Balance Movement Analysis
+
+CASH_IN transactions were evaluated separately because they increase the sender's balance rather than decrease it.
+
+| Movement Pattern | Transaction Count | Average Absolute Difference |
+|---|---:|---:|
+| EXACT_CREDIT | 1,186,107 | 0.00 |
+| PARTIAL_CREDIT | 106,690 | 0.01 |
+| CREDIT_ABOVE_AMOUNT | 106,454 | 0.01 |
+| NO_BALANCE_CHANGE | 33 | 213,633.48 |
+
+Key observations:
+
+1. 1,186,107 transactions show an exact balance increase matching the transaction amount.
+2. 106,690 transactions show an increase lower than the expected amount by 0.01.
+3. 106,454 transactions show an increase higher than the expected amount by 0.01.
+4. The combined 213,144 one-cent variances represent small monetary differences.
+5. Another 33 transactions show no recorded sender balance movement despite positive transaction amounts.
+
+The one-cent differences should be distinguished from material balance discrepancies.
+
+The 33 unchanged-balance transactions require separate investigation because their differences are substantially larger.
+
+##### 3. Recipient Balance Movement Analysis
+
+Recipient-side reconciliation was restricted to non-fraudulent TRANSFER transactions involving tracked recipient accounts.
+
+| Recipient Movement Pattern | Transaction Count |
+|---|---:|
+| Exact Credit | 370,964 |
+| Unchanged Balance | 106 |
+| Partial Balance Increase | 65,534 |
+| Recipient Balance Decrease | 3,930 |
+| Increase Above Expected Amount | 88,278 |
+| Total Evaluated Transactions | 528,812 |
+
+Key observations:
+
+1. 370,964 transactions show an exact recipient balance increase matching the transaction amount.
+2. 65,534 transactions show a positive increase smaller than the transaction amount.
+3. 88,278 transactions show a recipient balance increase greater than the transaction amount.
+4. 3,930 transactions show a decrease in the recorded recipient balance.
+5. 106 transactions show no recorded recipient balance movement.
+
+These findings indicate substantial differences between expected transaction-level credits and recorded recipient balance changes.
+
+However, they do not establish that the recipient failed to receive money. Multiple transfers to the same recipient within the same simulated hour can produce repeated balance snapshots, making individual transaction-level reconciliation difficult.
+
+##### 4. Repeated Recipient Activity
+
+The same-hour recipient investigation identified repeated incoming transfer activity for recipient accounts within individual simulation steps.
+
+Some recipient accounts appeared multiple times within the same hour, with repeated or changing recorded balance snapshots.
+
+This supports the need to consider recipient-level activity within each simulated hour when interpreting transaction-level balance differences.
+
+However, the hourly step field does not provide an exact intra-hour timestamp. Therefore, the precise sequence of balance updates cannot be established from the available timestamp information alone.
+
+##### 5. Merchant Balance Treatment
+
+Merchant recipient balances were treated as NOT_TRACKED rather than balance mismatches.
+
+This prevents unavailable merchant balance information from being incorrectly classified as a failed credit or data-quality issue.
+
+##### 6. Key Findings
+
+1. The zero-floor formula provides a substantially better empirical match for outgoing sender balance movements.
+2. CASH_IN contains 213,144 one-cent balance variances and 33 unchanged-balance transactions.
+3. Recipient-side TRANSFER reconciliation identifies 157,848 transaction-level differences.
+4. The largest recipient-side mismatch group consists of transactions where recorded balance increases exceed the individual transaction amount.
+5. Repeated recipient activity within the same simulation hour complicates individual transaction-level balance reconciliation.
+6. Remaining sender mismatches were not marked by the dataset's is_flagged_fraud indicator.
+7. Merchant balance information must remain excluded from recipient balance reconciliation.
+
+##### 7. Interpretation
+
+The balance movement investigation demonstrates that transaction amounts and recorded account balance changes cannot always be compared using one universal formula.
+
+Outgoing transactions exhibit strong empirical evidence of zero-floor balance handling, while CASH_IN requires a separate positive-movement calculation.
+
+Recipient-side TRANSFER reconciliation presents additional complexity because multiple transactions can involve the same recipient within an hourly simulation step.
+
+The investigation also distinguishes small monetary variances from larger balance differences, preventing minor precision-level differences from being treated as equivalent to substantial reconciliation exceptions.
+
+Overall, the findings demonstrate the importance of understanding transaction direction, account balance tracking, simulation behaviour and transaction-level aggregation before interpreting balance discrepancies.
+
+##### 8. Analytical Limitations
+
+- The dataset is simulated and should not be treated as evidence of actual banking-system behaviour.
+- A balance mismatch does not automatically establish fraud, transaction failure or financial loss.
+- The hourly step field does not provide exact transaction timestamps.
+- Recipient-side balance snapshots may reflect multiple transactions within the same simulation hour.
+- The precise cause of all remaining discrepancies has not been established.
+- is_flagged_fraud is a separate indicator and does not represent complete fraud ground truth.
+- Merchant destination balances are unavailable for direct reconciliation.
+
+**Documentation status:** Diagnostic investigation completed. Final analytical results and independent validation remain pending.
