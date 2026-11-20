@@ -1088,23 +1088,121 @@ Maximum Amount = MAX(amount)
 - CASE WHEN
 - Conditional aggregation
 
-### Limitations
-
-The analysis uses simulated mobile-money
-transaction amounts.
-
-Average values may be influenced by
-extremely large transactions.
-
-Median values provide additional context
-about the middle of the transaction distribution.
-
-Existing fraud labels are simulated labels
-and not independently verified real-world fraud.
 
 ### Results and Interpretation
 
-To be completed after SQL implementation.
+#### Actual Query Results — Transaction Amount Distribution
+
+| Transaction Type | Transaction Count | Total Transaction Value | Average Amount | Median Amount | Minimum Amount | Maximum Amount |
+|---|---:|---:|---:|---:|---:|---:|
+| CASH_OUT | 2,237,500 | 394,412,995,224.49 | 176,273.96 | 147,072.19 | 0.00 | 10,000,000.00 |
+| PAYMENT | 2,151,495 | 28,093,371,138.37 | 13,057.60 | 9,482.19 | 0.02 | 238,637.98 |
+| CASH_IN | 1,399,284 | 236,367,391,912.46 | 168,920.24 | 143,427.71 | 0.04 | 1,915,267.90 |
+| TRANSFER | 532,909 | 485,291,987,263.17 | 910,647.01 | 486,308.39 | 2.60 | 92,445,516.64 |
+| DEBIT | 41,432 | 227,199,221.28 | 5,483.67 | 3,048.99 | 0.55 | 569,077.51 |
+
+#### Mean–Median Comparison
+
+| Transaction Type | Average Amount | Median Amount | Mean–Median Difference |
+|---|---:|---:|---:|
+| CASH_OUT | 176,273.96 | 147,072.19 | 29,201.78 |
+| PAYMENT | 13,057.60 | 9,482.19 | 3,575.41 |
+| CASH_IN | 168,920.24 | 143,427.71 | 25,492.53 |
+| TRANSFER | 910,647.01 | 486,308.39 | 424,338.62 |
+| DEBIT | 5,483.67 | 3,048.99 | 2,434.68 |
+
+#### Key Findings
+
+1. CASH_OUT has the highest transaction frequency,
+   accounting for 2,237,500 transaction records.
+
+2. TRANSFER has the highest average transaction
+   amount at 910,647.01.
+
+3. TRANSFER also has the highest median transaction
+   amount at 486,308.39.
+
+4. TRANSFER exhibits the largest mean–median
+   difference of 424,338.62, suggesting that
+   relatively large transaction values influence
+   its arithmetic average.
+
+5. The maximum transaction amount occurs in
+   TRANSFER, reaching 92,445,516.64.
+
+6. PAYMENT has a comparatively smaller
+   mean–median difference of 3,575.41.
+
+7. CASH_OUT has the lowest recorded amount
+   of 0.00, and the dataset contains 16
+   zero-amount transactions.
+
+#### Validation
+
+The independent validation query confirmed:
+
+- Total transaction records: 6,362,620.
+- Reconciled transaction count: 6,362,620.
+- Total transaction value: 1,144,392,944,759.77.
+- Reconciled transaction value: 1,144,392,944,759.77.
+- Distinct transaction categories: 5.
+- Category groups: 5.
+- Zero-amount transactions: 16.
+- Reconciled zero-amount transactions: 16.
+- Overall minimum amount: 0.00.
+- Overall maximum amount: 92,445,516.64.
+- Average boundary violations: 0.
+- Median boundary violations: 0.
+
+All seven validation checks returned TRUE.
+
+#### Interpretation
+
+The transaction amount distribution analysis reveals
+substantial differences in monetary characteristics
+across transaction categories.
+
+TRANSFER stands out because it has the highest
+average and median transaction amounts, as well
+as the highest recorded transaction amount.
+
+Its mean–median difference is considerably larger
+than those of the other categories.
+
+This suggests that relatively high-value transactions
+influence the average transaction amount, making
+the median an important complementary measure
+when describing typical transaction values.
+
+CASH_OUT, despite having the highest transaction
+frequency, has a substantially lower average
+transaction amount than TRANSFER.
+
+This demonstrates that transaction frequency alone
+does not represent monetary contribution.
+
+The analysis also confirms the presence of
+16 zero-amount transaction records. These records
+were retained in the primary calculations rather
+than excluded without a documented reason.
+
+#### Limitations
+
+- The mean–median difference is a descriptive
+  indicator, not conclusive proof of outliers
+  or a specific distribution shape.
+- Percentiles, interquartile range and distribution
+  visualisations would provide further evidence
+  about the upper tail.
+- The analysis does not establish why particular
+  transaction categories contain higher amounts.
+- Total transaction value is not equivalent to
+  revenue, profit or actual financial benefit.
+- Findings describe the supplied synthetic
+  PaySim transaction dataset and should not
+  be generalised directly to production payment
+  platforms.
+
 
 
 ## Q10. Balance Movement Analysis
