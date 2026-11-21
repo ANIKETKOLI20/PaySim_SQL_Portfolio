@@ -3,353 +3,201 @@
 -- PaySim SQL Portfolio
 -- Q10: Balance Movement Analysis
 --
+-- Business Question:
+-- How do observed sender balance movements vary across
+-- transaction categories and fraud labels, and how closely
+-- do non-fraudulent sender movements reconcile with
+-- category-specific expected balance changes?
+--
+-- For recipients, how do recorded balance movements compare
+-- with transaction amounts for non-fraudulent TRANSFER
+-- transactions involving tracked recipient accounts?
+--
 -- Objective:
--- Examine sender and recipient balance movements,
--- compare observed movements against expected movements,
--- and identify balance reconciliation exceptions.
+-- Investigate sender balance movements across transaction
+-- categories and fraud labels, evaluate non-fraudulent sender
+-- balance reconciliation, and examine recipient-side
+-- differences within the eligible TRANSFER population.
 --
--- Output Grain:
--- One row per transaction category.
+-- Sender Scope:
+-- Actual sender movements are summarized by transaction
+-- category and fraud label.
+-- Expected movement and reconciliation classifications
+-- apply to non-fraudulent transactions.
 --
--- Metrics:
--- 1. Transaction count
--- 2. Total transaction value
--- 3. Sender balance matches
--- 4. Sender balance mismatches
--- 5. Annulled fraud transactions
--- 6. Absolute sender discrepancy
--- 7. Evaluated recipient balances
--- 8. Untracked merchant balances
--- 9. Recipient balance not applicable
--- 10. Annulled recipient-side fraud transactions
--- 11. Recipient balance matches
--- 12. Recipient balance mismatches
--- 13. Absolute recipient discrepancy
+-- Recipient Scope:
+-- Restricted to non-fraudulent TRANSFER transactions
+-- involving tracked recipient accounts with available
+-- opening and closing balances.
 --
--- Data Treatment:
--- Merchant balances (recipient ID beginning with M)
--- are not tracked.
+-- Recipient differences are observed balance snapshot
+-- differences, not confirmed failed credits.
 --
--- Recipient reconciliation is applicable only to
--- tracked TRANSFER destination accounts.
---
--- Fraud-labelled transactions are treated separately
--- because fraudulent transactions are annulled in PaySim.
---
--- Important:
--- Discrepancies are reconciliation exceptions.
--- They are not automatically evidence of fraud,
--- data corruption or actual financial loss.
+-- Variance Classification:
+-- Exact Match          = difference is 0
+-- Minor Variance       = absolute difference > 0 and <= 0.01
+-- Material Difference  = absolute difference > 0.01
 -- ============================================================
 
-
--- Step 1: Calculate transaction-level balance movements
-
-WITH transaction_balance_movements AS (
-
+WITH transaction_movements AS (
     SELECT
-
-        record_id,
         transaction_type,
-        amount,
         is_fraud,
-
-        sender_id,
         recipient_id,
 
-        sender_old_balance,
-        sender_new_balance,
-
-        recipient_old_balance,
-        recipient_new_balance,
-
-
-        -- Actual sender balance movement
         sender_new_balance - sender_old_balance
-            AS actual_sender_balance_change,
+            AS actual_sender_movement,
 
-
-        -- Expected sender balance movement
         CASE
-
-            -- CASH_IN increases the originating account
-            WHEN transaction_type = 'CASH_IN'
+            WHEN is_fraud = 0 AND transaction_type = 'CASH_IN'
                 THEN amount
-
-            -- Other transaction categories decrease
-            -- the originating account
-            WHEN transaction_type IN (
-                'CASH_OUT',
-                'DEBIT',
-                'PAYMENT',
-                'TRANSFER'
-            )
-                THEN -amount
-
+            WHEN is_fraud = 0
+             AND transaction_type IN ('CASH_OUT', 'DEBIT', 'PAYMENT', 'TRANSFER')
+                THEN GREATEST(sender_old_balance - amount, 0) - sender_old_balance
             ELSE NULL
+        END AS expected_sender_movement,
 
-        END AS expected_sender_balance_change,
-
-
-        -- Actual recipient balance movement
-        CASE
-
-            WHEN recipient_id LIKE 'M%'
-                THEN NULL
-
-            ELSE recipient_new_balance - recipient_old_balance
-
-        END AS actual_recipient_balance_change,
-
-
-        -- Expected recipient movement
-        -- Only TRANSFER represents a tracked
-        -- mobile-wallet-to-mobile-wallet credit.
-        CASE
-
+               CASE
             WHEN transaction_type = 'TRANSFER'
+             AND is_fraud = 0
+             AND recipient_id IS NOT NULL
              AND recipient_id NOT LIKE 'M%'
-                THEN amount
-
+             AND recipient_old_balance IS NOT NULL
+             AND recipient_new_balance IS NOT NULL
+                THEN recipient_new_balance - recipient_old_balance
             ELSE NULL
-
-        END AS expected_recipient_balance_change
-
-    FROM public.transactions
-
-),
-
-
--- Step 2: Evaluate sender balance consistency
-
-sender_balance_checks AS (
-
-    SELECT
-
-        *,
+        END AS actual_recipient_movement,
 
         CASE
-
-            -- Fraud-labelled transactions are annulled
-            WHEN is_fraud = 1
-                THEN 'ANNULLED_FRAUD'
-
-            WHEN expected_sender_balance_change IS NULL
-                THEN 'NOT_EVALUATED'
-
-            WHEN actual_sender_balance_change =
-                 expected_sender_balance_change
-                THEN 'MATCH'
-
-            ELSE 'MISMATCH'
-
-        END AS sender_balance_status,
-
-
-        actual_sender_balance_change
-            - expected_sender_balance_change
-            AS sender_balance_difference
-
-    FROM transaction_balance_movements
-
-),
-
-
--- Step 3: Evaluate recipient balance consistency
-
-transaction_balance_checks AS (
-
-    SELECT
-
-        *,
+            WHEN transaction_type = 'TRANSFER'
+             AND is_fraud = 0
+             AND recipient_id IS NOT NULL
+             AND recipient_id NOT LIKE 'M%'
+             AND recipient_old_balance IS NOT NULL
+             AND recipient_new_balance IS NOT NULL
+                THEN amount
+            ELSE NULL
+        END AS expected_recipient_movement,
 
         CASE
-
-            -- Merchant balance information is unavailable
+            WHEN transaction_type = 'TRANSFER' AND is_fraud = 1
+                THEN 'FRAUD_LABELLED_NOT_EVALUATED'
             WHEN recipient_id LIKE 'M%'
                 THEN 'NOT_TRACKED'
-
-            -- Cash-in, cash-out and debit do not represent
-            -- a tracked wallet-to-wallet recipient credit.
             WHEN transaction_type <> 'TRANSFER'
                 THEN 'NOT_APPLICABLE'
+            WHEN recipient_id IS NULL
+              OR recipient_old_balance IS NULL
+              OR recipient_new_balance IS NULL
+                THEN 'NOT_EVALUATED'
+            ELSE 'EVALUATED'
+        END AS recipient_scope
 
-            -- Fraudulent transfers are annulled
-            WHEN is_fraud = 1
-                THEN 'ANNULLED_FRAUD'
-
-            WHEN actual_recipient_balance_change =
-                 expected_recipient_balance_change
-                THEN 'MATCH'
-
-            ELSE 'MISMATCH'
-
-        END AS recipient_balance_status,
-
-
-        actual_recipient_balance_change
-            - expected_recipient_balance_change
-            AS recipient_balance_difference
-
-    FROM sender_balance_checks
-
+    FROM public.transactions
 ),
 
-
--- Step 4: Aggregate results by transaction category
-
-category_balance_summary AS (
-
+movement_differences AS (
     SELECT
-
-        transaction_type,
-
-        COUNT(*) AS transaction_count,
-
-        SUM(amount) AS total_transaction_value,
-
-
-        -- Sender balance checks
-
-        SUM(
-            CASE
-                WHEN sender_balance_status = 'MATCH'
-                    THEN 1 ELSE 0
-            END
-        ) AS sender_balance_match_count,
-
-
-        SUM(
-            CASE
-                WHEN sender_balance_status = 'MISMATCH'
-                    THEN 1 ELSE 0
-            END
-        ) AS sender_balance_mismatch_count,
-
-
-        SUM(
-            CASE
-                WHEN sender_balance_status = 'ANNULLED_FRAUD'
-                    THEN 1 ELSE 0
-            END
-        ) AS sender_annulled_fraud_count,
-
-
-        ROUND(
-            SUM(
-                CASE
-                    WHEN sender_balance_status = 'MISMATCH'
-                        THEN ABS(sender_balance_difference)
-                    ELSE 0
-                END
-            ),
-            2
-        ) AS total_absolute_sender_discrepancy,
-
-
-        -- Recipient balance eligibility
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status IN ('MATCH', 'MISMATCH')
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_balance_evaluated_count,
-
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status = 'NOT_TRACKED'
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_balance_untracked_count,
-
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status = 'NOT_APPLICABLE'
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_balance_not_applicable_count,
-
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status = 'ANNULLED_FRAUD'
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_annulled_fraud_count,
-
-
-        -- Recipient reconciliation results
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status = 'MATCH'
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_balance_match_count,
-
-
-        SUM(
-            CASE
-                WHEN recipient_balance_status = 'MISMATCH'
-                    THEN 1 ELSE 0
-            END
-        ) AS recipient_balance_mismatch_count,
-
-
-        ROUND(
-            SUM(
-                CASE
-                    WHEN recipient_balance_status = 'MISMATCH'
-                        THEN ABS(recipient_balance_difference)
-                    ELSE 0
-                END
-            ),
-            2
-        ) AS total_absolute_recipient_discrepancy
-
-
-    FROM transaction_balance_checks
-
-    GROUP BY transaction_type
-
+        *,
+        actual_sender_movement - expected_sender_movement
+            AS sender_difference,
+        actual_recipient_movement - expected_recipient_movement
+            AS recipient_difference
+    FROM transaction_movements
 )
 
-
--- Step 5: Final category-level analytical output
-
 SELECT
-
     transaction_type,
+    is_fraud,
+    COUNT(*) AS transaction_count,
 
-    transaction_count,
+    -- Sender balance movement
+    ROUND(AVG(actual_sender_movement), 2)
+        AS average_actual_sender_movement,
+    ROUND(AVG(expected_sender_movement), 2)
+        AS average_expected_sender_movement,
 
-    total_transaction_value,
+    SUM(CASE
+        WHEN is_fraud = 0 AND sender_difference = 0 THEN 1
+        ELSE 0
+    END) AS sender_exact_match_count,
 
-    sender_balance_match_count,
+    SUM(CASE
+        WHEN is_fraud = 0
+         AND ABS(sender_difference) > 0
+         AND ABS(sender_difference) <= 0.01 THEN 1
+        ELSE 0
+    END) AS sender_minor_variance_count,
 
-    sender_balance_mismatch_count,
+    SUM(CASE
+        WHEN is_fraud = 0
+         AND ABS(sender_difference) > 0.01 THEN 1
+        ELSE 0
+    END) AS sender_material_difference_count,
 
-    sender_annulled_fraud_count,
+    SUM(CASE
+        WHEN is_fraud = 1 THEN 1
+        ELSE 0
+    END) AS sender_fraud_label_count,
 
-    total_absolute_sender_discrepancy,
+    ROUND(SUM(CASE
+        WHEN is_fraud = 0 AND sender_difference IS NOT NULL
+            THEN ABS(sender_difference)
+        ELSE 0
+    END), 2) AS total_absolute_sender_difference,
 
-    recipient_balance_evaluated_count,
+    -- Recipient balance movement
+    SUM(CASE WHEN recipient_scope = 'EVALUATED' THEN 1 ELSE 0 END)
+        AS recipient_evaluated_count,
 
-    recipient_balance_untracked_count,
+    ROUND(AVG(actual_recipient_movement), 2)
+        AS average_actual_recipient_movement,
+    ROUND(AVG(expected_recipient_movement), 2)
+        AS average_expected_recipient_movement,
 
-    recipient_balance_not_applicable_count,
+    SUM(CASE
+        WHEN recipient_scope = 'EVALUATED'
+         AND recipient_difference = 0 THEN 1
+        ELSE 0
+    END) AS recipient_exact_match_count,
 
-    recipient_annulled_fraud_count,
+    SUM(CASE
+        WHEN recipient_scope = 'EVALUATED'
+         AND ABS(recipient_difference) > 0
+         AND ABS(recipient_difference) <= 0.01 THEN 1
+        ELSE 0
+    END) AS recipient_minor_variance_count,
 
-    recipient_balance_match_count,
+    SUM(CASE
+        WHEN recipient_scope = 'EVALUATED'
+         AND ABS(recipient_difference) > 0.01 THEN 1
+        ELSE 0
+    END) AS recipient_material_difference_count,
 
-    recipient_balance_mismatch_count,
+    SUM(CASE
+        WHEN recipient_scope = 'EVALUATED'
+         AND ABS(recipient_difference) > 0 THEN 1
+        ELSE 0
+    END) AS recipient_total_difference_count,
 
-    total_absolute_recipient_discrepancy
+    SUM(CASE WHEN recipient_scope = 'NOT_TRACKED' THEN 1 ELSE 0 END)
+        AS recipient_not_tracked_count,
 
-FROM category_balance_summary
+    SUM(CASE WHEN recipient_scope = 'NOT_APPLICABLE' THEN 1 ELSE 0 END)
+        AS recipient_not_applicable_count,
 
-ORDER BY transaction_type ASC;
+    SUM(CASE WHEN recipient_scope = 'FRAUD_LABELLED_NOT_EVALUATED' THEN 1 ELSE 0 END)
+        AS recipient_fraud_label_count,
+
+    SUM(CASE WHEN recipient_scope = 'NOT_EVALUATED' THEN 1 ELSE 0 END)
+        AS recipient_not_evaluated_count,
+
+    ROUND(SUM(CASE
+        WHEN recipient_scope = 'EVALUATED'
+            THEN ABS(recipient_difference)
+        ELSE 0
+    END), 2) AS total_absolute_recipient_difference
+
+FROM movement_differences
+GROUP BY transaction_type, is_fraud
+ORDER BY transaction_type, is_fraud;
