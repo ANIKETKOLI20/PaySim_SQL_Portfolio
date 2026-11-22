@@ -206,13 +206,11 @@ and low-activity simulation steps.
 ### Data Requirements
 
 - step
-- type
 - amount
 
 ### Analytical Definitions
 
 - Dimension: Simulation step
-- Additional dimension: Transaction type
 - Metric 1: Transaction count
 - Metric 2: Total transaction value
 
@@ -748,6 +746,22 @@ Transaction Volume Share (%) =
 Monetary Value Share (%) =
 (Segment Total Transaction Amount / Overall Transaction Amount) * 100
 
+
+#### Sender Segmentation
+
+- One-time sender: Sender identifier associated with exactly one transaction.
+- Repeat sender: Sender identifier associated with more than one transaction.
+
+#### Sender Segment Metrics
+
+| Metric | Definition |
+|---|---|
+| Distinct sender accounts | Number of unique sender identifiers in each segment |
+| Transaction count | Total transaction records associated with each segment |
+| Transaction volume share (%) | Segment transaction count / Overall transaction count * 100 |
+| Total transaction value | Sum of transaction amounts associated with each segment |
+| Monetary value share (%) | Segment transaction value / Overall transaction value * 100 |
+
 ### SQL Concepts
 
 - GROUP BY
@@ -856,6 +870,23 @@ simulated sender-account activity and should
 not be interpreted as actual customer engagement,
 customer retention or real-world banking behaviour.
 
+The sender segmentation analysis reveals that transaction activity is overwhelmingly concentrated among one-time sender identifiers. Approximately 99.85% of distinct sender accounts appear in only one transaction, while approximately 0.15% are classified as repeat senders.
+
+One-time senders contribute 99.7075% of transaction volume and 99.7021% of total transaction value. Repeat senders contribute only 0.2925% of transaction volume and 0.2979% of monetary value.
+
+These findings demonstrate that repeat sender activity represents a very small proportion of the overall simulated sender population. The results describe transaction frequency across sender identifiers and should not be interpreted as customer retention or engagement.
+
+
+#### Actual Query Results — Sender Activity Segment Summary
+
+| Sender Segment | Distinct Sender Accounts | Transaction Count | Transaction Volume Share (%) | Total Transaction Value | Monetary Value Share (%) |
+|---|---:|---:|---:|---:|---:|
+| ONE_TIME| 6344009 | 6344009 |  99.7075 | 1140984061038.01 | 99.7021 |
+| REPEAT | 9298 | 18611 | 0.2925 | 3408883721.76 | 0.2979 |
+| **Total** | **6,353,307** | **6,362,620** | **100.0000** | **1,144,392,944,759.77** | **100.0000** |
+
+
+
 #### Limitations
 
 - Sender identifiers represent originating
@@ -895,8 +926,29 @@ customer and merchant receiving accounts.
 
 - Primary dimension: Recipient type
 - Recipient identifier: nameDest
-- Customer identifier: Starts with C
-- Merchant identifier: Starts with M
+
+
+#### Recipient Classification Rules
+
+- CUSTOMER_CODED: Recipient identifier beginning with C.
+- MERCHANT_CODED: Recipient identifier beginning with M.
+- OTHER_UNCLASSIFIED: Recipient identifier with any other prefix.
+- NULL_IDENTIFIER: Missing recipient identifier, if present.
+
+These classifications are based on the identifier format
+provided by the PaySim dataset.
+
+#### Recipient Segment Metrics
+
+| Metric | Definition |
+|---|---|
+| Distinct recipient identifiers | Number of unique recipient IDs in each segment |
+| Transaction count | Number of transaction records associated with each segment |
+| Transaction volume share (%) | Segment transaction count / Overall transaction count * 100 |
+| Total transaction value | Sum of transaction amounts associated with each segment |
+| Average transaction amount | Average transaction amount within each segment |
+| Monetary value share (%) | Segment transaction value / Overall transaction value * 100 |
+
 
 ### Metrics
 
@@ -946,6 +998,19 @@ Transaction Value Share (%) =
 | 9 | C1360767589 | 98 | 35,121,289.27 | 358,380.50 | 0.00154 | 0.00307 |
 | 10 | C1023714065 | 97 | 42,402,918.40 | 437,143.49 | 0.00152 | 0.00371 |
 
+
+
+#### Actual Query Results — Recipient Type Segment Summary
+
+| Recipient Type | Distinct Recipient Identifiers | Transaction Count | Transaction Volume Share (%) | Total Transaction Value | Average Transaction Amount | Monetary Value Share (%) |
+|---|---:|---:|---:|---:|---:|---:|
+| CUSTOMER_CODED | 571,961 | 4,211,125 | 66.1854 | 1,116,299,573,621.40 | 265,083.46 | 97.5451 |
+| MERCHANT_CODED | 2,150,401 | 2,151,495 | 33.8146 | 28,093,371,138.37 | 13,057.60 | 2.4549 |
+| **Total** | **2,722,362** | **6,362,620** | **100.0000** | **1,144,392,944,759.77** | **179,861.90** | **100.0000** |
+
+Only retain rows for classifications returned by the actual query.
+
+
 #### Recipient Population Summary
 
 | Validation Metric | Actual Result |
@@ -954,6 +1019,9 @@ Transaction Value Share (%) =
 | Distinct recipient IDs | 2,722,362 |
 | Total transaction records | 6,362,620 |
 | Total recorded transaction value | 1,144,392,944,759.77 |
+
+C prefix = customer-coded recipient.
+M prefix = merchant-coded recipient.
 
 #### Top-Ten Concentration Summary
 
@@ -1035,7 +1103,197 @@ distribution of incoming transaction activity.
   as actual production payment-platform behaviour.
 
 
+
 ## Q9. Transaction Amount Distribution Analysis
+
+### Business Question
+
+How does the distribution of transaction amounts
+differ across transaction categories and fraud labels?
+
+### Objective
+
+Understand transaction amount characteristics
+and identify differences between transaction
+categories and simulated fraud-labelled groups.
+
+### Data Requirements
+
+- transaction_type
+- amount
+- is_fraud
+
+### Analytical Definitions
+
+- Primary dimension: Transaction type
+- Secondary dimension: Fraud label
+- Metric 1: Transaction count
+- Metric 2: Total transaction value
+- Metric 3: Average transaction amount
+- Metric 4: Median transaction amount
+- Metric 5: Minimum transaction amount
+- Metric 6: Maximum transaction amount
+
+### Metric Calculations
+
+Transaction Count = COUNT(*)
+
+Total Transaction Value = SUM(amount)
+
+Average Transaction Amount = AVG(amount)
+
+Median Transaction Amount =
+PERCENTILE_CONT(0.5)
+WITHIN GROUP (ORDER BY amount)
+
+Minimum Transaction Amount = MIN(amount)
+
+Maximum Transaction Amount = MAX(amount)
+
+### SQL Concepts
+
+- COUNT
+- SUM
+- AVG
+- PERCENTILE_CONT
+- MIN
+- MAX
+- GROUP BY
+- ORDER BY
+- Aggregate functions
+
+### Results and Interpretation
+
+#### Actual Query Results — Transaction Amount Distribution
+
+| Transaction Type | Fraud Label | Transaction Count | Total Transaction Value | Average Amount | Median Amount | Minimum Amount | Maximum Amount |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| CASH_OUT | 0 | 2,233,384 | 388,423,792,980.66 | 173,917.16 | 146,946.56 | 0.01 | 2,847,566.62 |
+| PAYMENT | 0 | 2,151,495 | 28,093,371,138.37 | 13,057.60 | 9,482.19 | 0.02 | 238,637.98 |
+| CASH_IN | 0 | 1,399,284 | 236,367,391,912.46 | 168,920.24 | 143,427.71 | 0.04 | 1,915,267.90 |
+| TRANSFER | 0 | 528,812 | 479,224,774,079.16 | 906,229.01 | 486,521.91 | 2.60 | 92,445,516.64 |
+| DEBIT | 0 | 41,432 | 227,199,221.28 | 5,483.67 | 3,048.99 | 0.55 | 569,077.51 |
+| CASH_OUT | 1 | 4,116 | 5,989,202,243.83 | 1,455,102.59 | 435,516.91 | 0.00 | 10,000,000.00 |
+| TRANSFER | 1 | 4,097 | 6,067,213,184.01 | 1,480,891.67 | 445,705.76 | 63.80 | 10,000,000.00 |
+| **Total** | **—** | **6,362,620** | **1,144,392,944,759.77** | **—** | **—** | **0.00** | **92,445,516.64** |
+
+Note:
+- Fraud Label 0 represents records labelled non-fraudulent.
+- Fraud Label 1 represents fraud-labelled records.
+- These are simulated dataset labels, not independently verified fraud outcomes.
+
+#### Mean–Median Comparison
+
+| Transaction Type | Fraud Label | Average Amount | Median Amount | Mean–Median Difference |
+|---|---:|---:|---:|---:|
+| CASH_OUT | 0 | 173,917.16 | 146,946.56 | 26,970.60 |
+| PAYMENT | 0 | 13,057.60 | 9,482.19 | 3,575.41 |
+| CASH_IN | 0 | 168,920.24 | 143,427.71 | 25,492.53 |
+| TRANSFER | 0 | 906,229.01 | 486,521.91 | 419,707.10 |
+| DEBIT | 0 | 5,483.67 | 3,048.99 | 2,434.68 |
+| CASH_OUT | 1 | 1,455,102.59 | 435,516.91 | 1,019,585.69 |
+| TRANSFER | 1 | 1,480,891.67 | 445,705.76 | 1,035,185.91 |
+
+#### Key Findings
+
+1. CASH_OUT with fraud label 0 has the highest transaction frequency, accounting for 2,233,384 records.
+
+2. Fraud-labelled transactions appear in two transaction categories: CASH_OUT with 4,116 records and TRANSFER with 4,097 records.
+
+3. Fraud-labelled CASH_OUT transactions have an average amount of 1,455,102.59, compared with 173,917.16 for records labelled non-fraudulent.
+
+4. Fraud-labelled TRANSFER transactions have an average amount of 1,480,891.67, compared with 906,229.01 for records labelled non-fraudulent.
+
+5. TRANSFER with fraud label 0 has the highest median transaction amount at 486,521.91.
+
+6. Fraud-labelled TRANSFER transactions exhibit the largest mean–median difference, at 1,035,185.91.
+
+7. The maximum transaction amount occurs in TRANSFER with fraud label 0, reaching 92,445,516.64.
+
+8. The dataset contains 8,213 fraud-labelled transactions, representing approximately 0.1291% of all transaction records.
+
+9. The dataset contains 16 zero-amount transaction records, which were retained in the primary analysis.
+
+#### Validation
+
+The independent validation query confirmed:
+
+- Total transaction records: 6,362,620.
+- Reconciled transaction count: 6,362,620.
+- Total transaction value: 1,144,392,944,759.77.
+- Reconciled transaction value: 1,144,392,944,759.77.
+- Distinct transaction categories: 5.
+- Transaction type and fraud-label groups: 7.
+- Fraud-labelled transactions: 8,213.
+- Zero-amount transactions: 16.
+- Seven expected transaction/fraud-label groups reconciled.
+- Group transaction counts and monetary values reconciled.
+- Group averages and medians reconciled.
+- Group minimum and maximum amounts reconciled.
+- Zero-amount and distribution boundary checks passed.
+
+The displayed independent validation checks returned TRUE.
+
+#### Interpretation
+
+The transaction amount distribution analysis demonstrates
+substantial differences in monetary characteristics
+across transaction categories and simulated fraud labels.
+
+CASH_OUT with fraud label 0 represents the largest
+transaction population, while TRANSFER with fraud
+label 1 records the highest average transaction amount.
+
+The comparison also identifies higher average
+transaction amounts among fraud-labelled records
+for both CASH_OUT and TRANSFER.
+
+The mean–median differences demonstrate that
+average transaction amounts can be influenced
+by relatively high-value transactions.
+
+Fraud-labelled TRANSFER transactions exhibit
+the largest mean–median difference, reinforcing
+the importance of evaluating median transaction
+amounts alongside averages.
+
+The analysis also demonstrates that transaction
+frequency and transaction amount characteristics
+provide different perspectives on simulated
+transaction activity.
+
+These findings describe the distribution of
+transaction amounts across existing simulated
+fraud labels. They do not establish that transaction
+amount alone can identify fraudulent activity
+or independently predict fraud.
+
+The 16 zero-amount records were retained in
+the primary calculations to preserve the
+original dataset population.
+
+#### Limitations
+
+- The is_fraud column contains existing simulated
+  fraud labels, not independently verified
+  real-world fraud outcomes.
+- Differences in average and median amounts
+  do not independently establish fraud risk.
+- Mean–median differences are descriptive
+  indicators, not conclusive proof of outliers
+  or a specific distribution shape.
+- Percentiles, interquartile range and distribution
+  visualisations would provide further evidence
+  about the upper tail.
+- The analysis does not establish why particular
+  transaction categories contain higher amounts.
+- Total transaction value is not equivalent to
+  revenue, profit or actual financial benefit.
+- Findings describe the supplied synthetic
+  PaySim transaction dataset and should not
+  be generalised directly to production payment
+  platforms.
+
 
 ### Business Question
 
