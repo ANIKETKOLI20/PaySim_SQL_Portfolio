@@ -226,9 +226,6 @@ Total Transaction Value = SUM(amount)
 - COUNT
 - SUM
 - ORDER BY
-- CASE WHEN
-- Window functions
-
 
 ### Results and Interpretation
 

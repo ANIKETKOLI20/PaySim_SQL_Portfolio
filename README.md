@@ -1,217 +1,194 @@
 # PaySim SQL Portfolio
 
-## Project Overview
+A PostgreSQL-based SQL analytics portfolio project using the **PaySim synthetic mobile-money transaction dataset**. The project investigates transaction activity, monetary patterns, simulated fraud labels, sender and recipient identifier segments, and transaction balance movements.
 
-This project demonstrates practical SQL and analytical skills using the PaySim synthetic mobile-money transaction dataset.
+The repository documents the full workflow from dataset profiling and data-quality investigation to SQL analysis, independent validation, and business-oriented interpretation.
 
-The primary objective is to develop hands-on experience in querying financial transaction data, analysing transaction patterns, performing aggregations, investigating simulated fraud indicators, and validating analytical results.
+> **Data note:** PaySim is synthetic data. The results describe the supplied simulation and should not be interpreted as actual UPI or production payment-platform behaviour.
 
-The project follows a structured analytical workflow, from dataset discovery and data-quality investigation to PostgreSQL-based SQL implementation and business interpretation.
+---
+
+## Project at a Glance
+
+| Item | Details |
+|---|---|
+| Dataset | Synthetic Financial Datasets For Fraud Detection (PaySim) |
+| Source | [Kaggle — PaySim](https://www.kaggle.com/datasets/ealaxi/paysim1) |
+| Original transaction records | 6,362,620 |
+| Original dataset columns | 11 |
+| Database | PostgreSQL |
+| Main table | `public.transactions` |
+| Analytical questions | 10 |
+| Transaction categories | 5 |
+| Observed simulation steps | 743 (steps 1–743) |
+| SQL validation | Independent validation scripts for Q2–Q10 |
 
 ## Project Objectives
 
-- Understand and profile a large financial transaction dataset.
-- Investigate missing values, duplicate records, identifiers and data-quality issues.
-- Develop meaningful analytical questions based on available data.
-- Implement analytical queries using PostgreSQL.
-- Apply SQL aggregations, joins where appropriate, CTEs, subqueries and window functions.
-- Validate query results and interpret findings.
-- Document the analysis in a reproducible GitHub repository.
+- Profile a large transaction-level dataset and document its structure and limitations.
+- Investigate missing values, exact duplicates, identifiers, transaction categories, fraud fields, numeric values, and balance consistency.
+- Define analytical questions that can be answered with the available fields.
+- Implement the analyses in PostgreSQL using clear, reusable SQL.
+- Validate aggregate totals, segment outputs, rankings, and distribution statistics independently of the analytical queries.
+- Translate query outputs into findings while distinguishing evidence from assumptions.
+- Publish an organised and reproducible project repository.
 
-## Dataset Information
+## Dataset
 
-**Dataset:** Synthetic Financial Datasets For Fraud Detection
+**Dataset name:** Synthetic Financial Datasets For Fraud Detection  
+**Creator:** Edgar Alonso Lopez-Rojas  
+**Source:** [Kaggle — PaySim](https://www.kaggle.com/datasets/ealaxi/paysim1)  
+**Original file:** `PS_20174392719_1491204439457_log.csv`  
+**Original file size:** Approximately 470 MB  
+**Dataset licence stated by the source project:** CC BY-SA 4.0. See the [Creative Commons licence](https://creativecommons.org/licenses/by-sa/4.0/).
 
-**Creator:** Edgar Alonso Lopez-Rojas
+One row in the original CSV represents one simulated transaction. The original CSV is **not committed to this repository**. The `.gitignore` excludes CSV/ZIP files under `data/original/`, Python bytecode and `__pycache__/`, the local `.venv/`, and other temporary files. Download the CSV from Kaggle and keep it in the local `data/original/` directory.
 
-**Source:** Kaggle  
-https://www.kaggle.com/datasets/ealaxi/paysim1
+### Original dataset fields
 
-**Original Research Paper:**  
-PaySim: A Financial Mobile Money Simulator for Fraud Detection (2016).
-
-**Licence:** CC BY-SA 4.0  
-https://creativecommons.org/licenses/by-sa/4.0/
-
-**Original File:** `PS_20174392719_1491204439457_log.csv`
-
-**File Size:** Approximately 470 MB
-
-**Total Records:** 6,362,620
-
-**Total Columns:** 11
-
-**Data Granularity:** One row represents one transaction.
-
-The original CSV is not included in this repository. Obtain it from the original dataset source.
-
-## Dataset Structure
-
-The dataset contains the following columns:
-
-| Column | Description |
+| Original field | Description |
 |---|---|
-| step | Hourly simulation step |
-| type | Transaction category |
-| amount | Individual transaction amount |
-| nameOrig | Sender account identifier |
-| oldbalanceOrg | Sender balance before transaction |
-| newbalanceOrig | Sender balance after transaction |
-| nameDest | Recipient account identifier |
-| oldbalanceDest | Recipient balance before transaction |
-| newbalanceDest | Recipient balance after transaction |
-| isFraud | Simulated fraud label |
-| isFlaggedFraud | Rule-based fraud flag |
+| `step` | Hourly simulation step |
+| `type` | Transaction category |
+| `amount` | Individual transaction amount |
+| `nameOrig` | Sender account identifier |
+| `oldbalanceOrg` | Sender balance before the transaction |
+| `newbalanceOrig` | Sender balance after the transaction |
+| `nameDest` | Recipient account identifier |
+| `oldbalanceDest` | Recipient balance before the transaction |
+| `newbalanceDest` | Recipient balance after the transaction |
+| `isFraud` | Simulated fraud label |
+| `isFlaggedFraud` | Separate rule-based fraud flag |
 
-The five transaction categories are:
+The five transaction categories are `CASH_IN`, `CASH_OUT`, `DEBIT`, `PAYMENT`, and `TRANSFER`.
 
-- CASH_IN
-- CASH_OUT
-- DEBIT
-- PAYMENT
-- TRANSFER
+### PostgreSQL table and column mapping
 
-## Project Workflow
+The SQL scripts load the original CSV fields into `public.transactions` using descriptive PostgreSQL column names:
 
-### Phase 1 — Dataset Discovery and Selection
-
-**Status: Completed**
-
-- Discovered and evaluated publicly available financial datasets.
-- Selected PaySim based on its transaction-level structure and financial relevance.
-- Reviewed dataset documentation, source and licence.
-- Examined the original research paper.
-- Documented dataset characteristics and limitations.
-
-### Phase 2 — Setup and Data Understanding
-
-**Status: Completed**
-
-Used Python and Pandas to inspect and investigate the complete dataset.
-
-Completed investigations:
-
-1. Initial CSV structure and column inspection.
-2. Full-dataset missing-value investigation.
-3. Exact duplicate record investigation.
-4. Sender and recipient identifier frequency analysis.
-5. Transaction category validation.
-6. Fraud flag value validation.
-7. Numeric quality investigation.
-8. Zero-amount transaction investigation.
-9. Sender and recipient balance consistency investigation.
-10. Consolidation of data-quality findings.
-
-#### Key Data Quality Findings
-
-| Investigation | Actual finding |
+| PostgreSQL column | Original CSV field / purpose |
 |---|---|
-| Total records | 6,362,620 |
-| Total columns | 11 |
-| Missing values detected | 0 |
-| Exact duplicate records | 0 |
-| Unexpected transaction categories | 0 |
-| Unexpected fraud flag values | 0 |
-| Negative numeric values detected | 0 |
-| Zero-amount transactions | 16 |
+| `record_id` | Database-generated identity key; not an original PaySim transaction ID |
+| `step` | `step` |
+| `transaction_type` | `type` |
+| `amount` | `amount` |
+| `sender_id` | `nameOrig` |
+| `sender_old_balance` | `oldbalanceOrg` |
+| `sender_new_balance` | `newbalanceOrig` |
+| `recipient_id` | `nameDest` |
+| `recipient_old_balance` | `oldbalanceDest` |
+| `recipient_new_balance` | `newbalanceDest` |
+| `is_fraud` | `isFraud` |
+| `is_flagged_fraud` | `isFlaggedFraud` |
 
-Additional observations:
+`record_id` is generated by PostgreSQL when rows are inserted. It should not be treated as a transaction identifier supplied by PaySim. The table definition and constraints are in [`sql/01_create_transactions_table.sql`](sql/01_create_transactions_table.sql).
 
-- Five expected transaction categories were identified.
-- All 16 zero-amount transactions were CASH_OUT records carrying the simulated fraud label.
-- Recipient identifiers were repeated more frequently than sender identifiers.
-- Balance movements differed across transaction categories and fraud labels.
-- Merchant destination balance information is unavailable for reconciliation.
+## Analytical Questions
 
-Detailed investigation results and limitations are documented in `research/data_quality_findings.md`.
+The project contains ten SQL analyses:
 
+| Question | Analysis | Main focus |
+|---|---|---|
+| Q1 | Transaction Volume Distribution | Transaction count and category share |
+| Q2 | Transaction Monetary Analysis | Total and average transaction amount by category |
+| Q3 | Hourly Transaction Trends | Transaction count and total amount by simulation step |
+| Q4 | Ranking Transaction Activity | Rank simulation steps by transaction count, then transaction amount |
+| Q5 | Fraud-Labelled Transaction Analysis | Fraud-labelled counts, category rates, and concentration |
+| Q6 | Fraud Flag vs Fraud Label Analysis | Confusion matrix, precision, and recall of the existing flag against the simulated label |
+| Q7 | Sender Activity Distribution | Top senders and one-time vs repeat sender segments |
+| Q8 | Recipient Transaction Concentration | Top recipients and customer-coded vs merchant-coded recipient identifier segments |
+| Q9 | Transaction Amount Distribution | Amount statistics by transaction category and fraud label |
+| Q10 | Balance Movement Analysis | Sender and eligible recipient balance movement comparisons |
 
-### Phase 3 — Analytical Question Discovery
+Detailed question definitions, calculation logic, query outputs, interpretations, and limitations are documented in [`research/analytical_questions.md`](research/analytical_questions.md). Consolidated findings are in [`research/results_and_insights.md`](research/results_and_insights.md).
 
-**Status: Completed**
+## Selected Findings
 
-Developed and validated ten analytical questions
-based on the PaySim dataset structure and
-available transaction fields.
+The figures below are from the recorded query outputs and consolidated analysis document.
 
-The questions cover:
+### Transaction activity and monetary value
 
-- Transaction volume and monetary analysis.
-- Hourly transaction trends and ranking.
-- Fraud-label and rule-based flag analysis.
-- Sender activity distribution.
-- Recipient transaction concentration.
-- Transaction amount distribution.
-- Sender and recipient balance movement analysis.
+- `CASH_OUT` is the largest category by transaction count: **2,237,500 transactions (35.17%)**.
+- `PAYMENT` contributes **2,151,495 transactions (33.81%)**. Together, `CASH_OUT` and `PAYMENT` represent **68.98%** of transaction records.
+- `TRANSFER` has the highest category-level total transaction amount: **485,291,987,263.17**, and the highest average amount: **910,647.01**.
+- Hourly activity is uneven. Step **19** has the highest transaction count (**51,352**); step **304** has the highest total transaction amount in the hourly output (**24,963,550,343.94**).
 
-**Documentation:**
+### Fraud labels and existing flag
 
-- [Analytical Questions Overview](research/analytical_questions_overview.md)
-- [Detailed Analytical Specifications](research/analytical_questions.md)
+- The dataset contains **8,213 fraud-labelled records**. They occur in `CASH_OUT` (**4,116**) and `TRANSFER` (**4,097**).
+- `TRANSFER` has the higher within-category fraud-label rate (**0.77%**) compared with `CASH_OUT` (**0.18%**).
+- The existing rule-based flag marks **16** records that all match the dataset's fraud label. Against those labels, the recorded confusion matrix gives **100% precision** and approximately **0.19% recall**. This evaluates agreement with the synthetic labels, not a production fraud system.
 
-All ten questions have been reviewed and approved.
-PostgreSQL implementation and analytical results
-are pending.
+### Sender and recipient segments
 
+| Sender segment | Distinct sender identifiers | Transactions | Transaction share | Monetary value share |
+|---|---:|---:|---:|---:|
+| One-time | 6,344,009 | 6,344,009 | 99.7075% | 99.7021% |
+| Repeat | 9,298 | 18,611 | 0.2925% | 0.2979% |
 
-### Phase 4 — PostgreSQL Setup and SQL Implementation
+Q8 classifies recipient identifiers using their supplied prefixes. These are dataset identifier categories, not independent verification of real-world customer or merchant identity.
 
-**Status: In Progress**
+| Recipient identifier segment | Distinct identifiers | Transactions | Transaction share | Monetary value share |
+|---|---:|---:|---:|---:|
+| Customer-coded (`C` prefix) | 571,961 | 4,211,125 | 66.1854% | 97.5451% |
+| Merchant-coded (`M` prefix) | 2,150,401 | 2,151,495 | 33.8146% | 2.4549% |
 
-- Installed PostgreSQL 18.7.
-- Verified PostgreSQL server service.
-- Established a successful local database connection.
-- Preparing the project database and transaction table.
-- Preparing to import and validate the PaySim dataset.
-- SQL implementation of Q1–Q10 is pending.
+### Transaction amount and balance movement
 
-PostgreSQL is the primary database platform for the analytical queries.
+- Q9 compares average, median, minimum, and maximum transaction amounts across **seven transaction-type/fraud-label groups**.
+- Fraud-labelled `CASH_OUT` and `TRANSFER` groups have higher average transaction amounts than their corresponding label-0 groups. The labels are simulated and do not establish actual fraud.
+- Q10 uses separate expected-movement logic for incoming and outgoing sender transactions. Recipient reconciliation is limited to eligible, non-fraud-labelled `TRANSFER` records with tracked recipient balances.
+- The recorded independent validation results include **8 passing Q7 checks, 16 passing Q8 checks, 10 passing Q9 checks, and 26 passing Q10 checks**.
 
-### Phase 5 — Validation and Interpretation
+See [`research/results_and_insights.md`](research/results_and_insights.md) for the full Q1–Q10 result tables, cross-question insights, validation evidence, and analytical limitations.
 
-**Status: Planned**
+## Methodology and SQL Techniques
 
-- Validate SQL query results.
-- Reconcile record counts and monetary totals.
-- Check join behaviour where applicable.
-- Review metric definitions and denominators.
-- Interpret results using documented assumptions and limitations.
+### Data understanding and quality checks
 
-### Phase 6 — Portfolio Publication
+Python and Pandas were used for initial CSV inspection and data-quality investigation. The documented checks include:
 
-**Status: In Progress**
+- Dataset dimensions and data types.
+- Missing-value counts.
+- Exact duplicate records.
+- Sender and recipient identifier frequency.
+- Transaction category and fraud-field values.
+- Numeric-value quality and zero-amount records.
+- Sender and recipient balance consistency.
 
-- Maintain executable scripts and documentation on GitHub.
-- Publish analytical results and validation evidence.
-- Prepare a LinkedIn project showcase.
+The recorded data-quality findings include **zero missing values**, **zero exact duplicate rows**, **zero unexpected transaction categories**, **zero unexpected fraud-flag values**, **zero negative numeric values**, and **16 zero-amount transactions**.
 
+### SQL analysis
 
-## Technology Stack
+The PostgreSQL analyses use:
 
-| Technology | Purpose |
-|---|---|
-| PostgreSQL 18.7 | Database management and SQL analysis |
-| SQL | Analytical query implementation |
-| Python 3.13.13 | Data inspection and profiling |
-| Pandas 3.1.1 | Data manipulation and initial auditing |
-| SQLite | Temporary disk-based audit operations |
-| Git | Version control |
-| GitHub | Project documentation and publication |
+- `GROUP BY` and aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`).
+- `CASE` expressions and conditional aggregation.
+- Common table expressions (CTEs).
+- Window functions and ranking.
+- Percentage calculations and denominator reconciliation.
+- `PERCENTILE_CONT(0.5)` for median transaction amounts.
+- Explicit scope rules for balance movement comparisons.
+
+The source dataset is primarily a single transaction table, so the project does not manufacture relational joins where the source does not provide a justified relationship.
+
+### Independent validation
+
+Validation SQL is stored in [`sql/validation/`](sql/validation/). These scripts independently recalculate and reconcile key outputs such as record counts, monetary totals, group counts, rankings, segment values, and distribution measures. Validation scripts are separate from the analytical queries so that checks do not simply reuse the analytical result as their own expected answer.
 
 ## Repository Structure
 
 ```text
 PaySim_SQL_Portfolio/
-│
 ├── data/
 │   └── original/
-│       └── Original CSV (local only)
-│
+│       └── .gitkeep                 # Original CSV is stored locally, not committed
 ├── research/
-│   ├── dataset_source_notes.md
-    ├── analytical_questions_overview.md
-│   ├── data_quality_findings.md
+│   ├── analytical_questions_overview.md
 │   ├── analytical_questions.md
+│   ├── data_quality_findings.md
+│   ├── dataset_source_notes.md
+│   ├── results_and_insights.md
 │   ├── missing_value_audit.csv
 │   ├── exact_duplicate_audit.csv
 │   ├── identifier_frequency_summary.csv
@@ -223,8 +200,8 @@ PaySim_SQL_Portfolio/
 │   ├── sender_balance_movement.csv
 │   ├── recipient_balance_movement.csv
 │   ├── top_10_senders.csv
-│   └── top_10_recipients.csv
-│
+│   ├── top_10_recipients.csv
+│   └── q3_hourly_transaction_trends.csv
 ├── scripts/
 │   ├── 01_initial_csv_inspection.py
 │   ├── 02_missing_value_audit.py
@@ -232,45 +209,193 @@ PaySim_SQL_Portfolio/
 │   ├── 04_identifier_frequency_audit.py
 │   ├── 05_category_flag_validation.py
 │   ├── 06_zero_amount_audit.py
-│   └── 07_balance_consistency_audit.py
-│
+│   ├── 07_balance_consistency_audit.py
+│   └── 08_monetary_precision_audit.py
 ├── sql/
-│   └── PostgreSQL analytical queries (in progress)
-│
+│   ├── 00_create_database.sql
+│   ├── 01_create_transactions_table.sql
+│   ├── 02_import_transactions.sql
+│   ├── 03_q1_transaction_volume.sql
+│   ├── 04_q2_transaction_monetary_analysis.sql
+│   ├── 05_q3_hourly_transaction_trends.sql
+│   ├── 06_q4_hourly_activity_ranking.sql
+│   ├── 07_q5_fraud_label_analysis.sql
+│   ├── 08_q6_fraud_flag_evaluation.sql
+│   ├── 09_q7_sender_activity_distribution.sql
+│   ├── 10_q8_recipient_transaction_concentration.sql
+│   ├── 11_q9_transaction_amount_distribution.sql
+│   ├── 12_q10_balance_movement_analysis.sql
+│   ├── .gitkeep
+│   └── validation/
+│       ├── 01_q2_monetary_reconciliation.sql
+│       ├── 02_q3_hourly_transaction.sql
+│       ├── 03_q4_hourly_activity_ranking.sql
+│       ├── 04_q5_fraud_label_analysis.sql
+│       ├── 05_q6_fraud_flag_evaluation.sql
+│       ├── 06_q7_sender_activity_distribution.sql
+│       ├── 07_q8_recipient_transaction_concentration.sql
+│       ├── 08_q9_transaction_amount_distribution.sql
+│       └── 09_q10_balance_movement_validation.sql
 ├── .gitignore
 └── README.md
 ```
 
-## Important Dataset Limitations
+The original PaySim CSV is intentionally excluded from tracked files. The local `.venv/`, Python cache files, and temporary files are excluded through `.gitignore`.
 
-- PaySim contains synthetic financial transactions rather than actual production payment records.
-- The dataset primarily provides a single transaction table with limited natural opportunities for relational joins.
-- It does not contain a dedicated transaction ID.
-- The step column represents hourly simulation steps, not actual calendar timestamps.
-- Merchant destination balance information is unavailable.
-- Existing fraud labels are simulated classifications.
-- The rule-based fraud flag is separate from the simulated fraud label.
-- Repeated account identifiers do not automatically indicate suspicious activity.
-- Transaction value cannot be interpreted as platform revenue or profit.
+## Reproducing the Analysis
 
-Findings should not be generalised directly to real-world UPI or mobile-money platforms.
+### Clone the repository
+
+Open PowerShell or a terminal and execute:
+
+```bash
+git clone https://github.com/ANIKETKOLI20/PaySim_SQL_Portfolio.git
+cd PaySim_SQL_Portfolio
+```
+
+Run the subsequent commands from this project root directory so that the relative SQL-script and CSV paths resolve as documented.
+
+### Requirements
+
+- PostgreSQL (the project was developed using PostgreSQL 18.7).
+- `psql` command-line client.
+- Python and Pandas only if you want to rerun the optional data-profiling and quality-audit scripts (the recorded environment used Python 3.13.13 and Pandas 3.1.1).
+- The original PaySim CSV downloaded from the [Kaggle dataset page](https://www.kaggle.com/datasets/ealaxi/paysim1).
+
+### 1. Obtain the dataset
+
+Download `PS_20174392719_1491204439457_log.csv` from Kaggle and place it at:
+
+```text
+data/original/PS_20174392719_1491204439457_log.csv
+```
+
+The CSV is excluded from Git by `.gitignore`; do not commit the original dataset or local credentials.
+
+### 2. Create the database
+
+From the repository root, open `psql` and connect to a database where you have permission to create databases (for example, the default `postgres` database):
+
+```powershell
+psql -U postgres -h localhost -p 5432 -d postgres
+```
+
+At the `psql` prompt, run:
+
+```sql
+\i sql/00_create_database.sql
+```
+
+Exit `psql`, then connect to the project database:
+
+```powershell
+psql -U postgres -h localhost -p 5432 -d paysim_analytics
+```
+
+### 3. Create the transaction table
+
+At the `paysim_analytics` `psql` prompt:
+
+```sql
+\i sql/01_create_transactions_table.sql
+```
+
+### 4. Import the original CSV
+
+The import script uses `\copy` with a project-relative path:
+
+```text
+data/original/PS_20174392719_1491204439457_log.csv
+```
+
+Start `psql` from the repository root before running the import. This is important because `\copy` reads the CSV through the local PostgreSQL client, and the relative path is resolved from the client's current working directory.
+
+At the `paysim_analytics` `psql` prompt, execute:
+
+```sql
+\i sql/02_import_transactions.sql
+```
+
+The import script appends rows; it does not truncate the table. Run it only once against an empty `public.transactions` table. Running it again will create duplicate copies of the imported records.
+
+Check the imported row count:
+
+```sql
+SELECT COUNT(*) FROM public.transactions;
+```
+
+Expected row count: `6362620`.
+
+### 5. Run the analytical SQL files
+
+Run the Q1–Q10 scripts from the repository root, in question order:
+
+```sql
+\i sql/03_q1_transaction_volume.sql
+\i sql/04_q2_transaction_monetary_analysis.sql
+\i sql/05_q3_hourly_transaction_trends.sql
+\i sql/06_q4_hourly_activity_ranking.sql
+\i sql/07_q5_fraud_label_analysis.sql
+\i sql/08_q6_fraud_flag_evaluation.sql
+\i sql/09_q7_sender_activity_distribution.sql
+\i sql/10_q8_recipient_transaction_concentration.sql
+\i sql/11_q9_transaction_amount_distribution.sql
+\i sql/12_q10_balance_movement_analysis.sql
+```
+
+### 6. Run the independent validation scripts
+
+The validation scripts are separate from the analytical queries. Run the available Q2–Q10 validations after the corresponding analysis:
+
+```sql
+\i sql/validation/01_q2_monetary_reconciliation.sql
+\i sql/validation/02_q3_hourly_transaction.sql
+\i sql/validation/03_q4_hourly_activity_ranking.sql
+\i sql/validation/04_q5_fraud_label_analysis.sql
+\i sql/validation/05_q6_fraud_flag_evaluation.sql
+\i sql/validation/06_q7_sender_activity_distribution.sql
+\i sql/validation/07_q8_recipient_transaction_concentration.sql
+\i sql/validation/08_q9_transaction_amount_distribution.sql
+\i sql/validation/09_q10_balance_movement_validation.sql
+```
+
+The `\i` commands are `psql` meta-commands. Run them inside the `psql` terminal, not in a standard SQL query editor. Paths are relative to the current working directory from which `psql` was launched; start `psql` from the repository root or adjust the paths accordingly.
+
+## Important Dataset and Analytical Limitations
+
+- **Synthetic data:** PaySim simulates mobile-money transactions. Findings are not actual UPI, bank, merchant, or customer performance results.
+- **Fraud labels:** `is_fraud` contains simulated labels, not independently verified real-world fraud outcomes.
+- **Fraud flag:** `is_flagged_fraud` is a separate rule-based field. Precision and recall in this project measure agreement with the PaySim labels only.
+- **Simulation time:** `step` is an hourly simulation index, not a calendar timestamp. The recorded dataset output contains 743 observed steps (1–743).
+- **Transaction identifiers:** The original dataset does not provide a dedicated transaction ID. `record_id` is generated by PostgreSQL and is not an original PaySim transaction identifier.
+- **Recipient classification:** Q8 uses `C` and `M` identifier prefixes to form customer-coded and merchant-coded groups. These prefixes do not independently verify real-world identity.
+- **Balance snapshots:** Repeated activity to the same recipient within a simulation step can complicate transaction-level balance reconciliation. Exact intra-hour transaction ordering is not available.
+- **Merchant balances:** Merchant destination balance information is not available for the same recipient-side reconciliation used for tracked recipients.
+- **Monetary units:** Amounts are reported in the dataset's recorded units. Do not assume INR unless the source documentation establishes that interpretation.
+- **Revenue and profit:** Transaction amount is not platform revenue, fee income, profit, or financial benefit.
+- **Variance tolerance:** The 0.01 minor-variance threshold used in Q10 is a project-specific analytical tolerance, not a universal accounting standard.
 
 ## Research Reference
 
-Lopez-Rojas, E.A., Elmir, A., and Axelsson, S. (2016).
+Lopez-Rojas, E. A., Elmir, A., and Axelsson, S. (2016). *PaySim: A Financial Mobile Money Simulator for Fraud Detection.* 28th European Modeling and Simulation Symposium (EMSS 2016).
 
-*PaySim: A Financial Mobile Money Simulator for Fraud Detection.*
 
-28th European Modeling and Simulation Symposium (EMSS 2016).
 
-## Current Project Status
+## Project Status
 
-**Phase 3 Completed — Analytical Question Discovery**
+| Phase | Status |
+|---|---|
+| Phase 1 — Setup & Planning | Completed |
+| Phase 2 — Data Understanding | Completed |
+| Phase 3 — Analytical Question Development | Completed |
+| Phase 4 — SQL Implementation | Completed |
+| Phase 5 — Results & Insights | Completed |
+| Phase 6 — Portfolio Publication | In Progress |
 
-**Phase 4 In Progress — PostgreSQL Setup and SQL Implementation**
+All ten analytical questions have been implemented.
+Results and interpretations have been documented,
+and independent validation has been completed
+for the analytical checks included in the project.
 
-The next milestone is to create the project database, design the transaction table, import the dataset and begin implementing the ten analytical questions using PostgreSQL.
 
----
-
-*This is an ongoing practical SQL portfolio project. Analytical results will be added as queries are implemented, executed and validated.*
+*This repository is a practical SQL analytics portfolio project. Its purpose is to demonstrate structured data investigation, analytical SQL, independent validation, careful interpretation, and clear documentation—not to claim production payment-system or fraud-detection experience.*
