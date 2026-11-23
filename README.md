@@ -137,7 +137,7 @@ Q8 classifies recipient identifiers using their supplied prefixes. These are dat
 ### Transaction amount and balance movement
 
 - Q9 compares average, median, minimum, and maximum transaction amounts across **seven transaction-type/fraud-label groups**.
-- - Fraud-labelled `TRANSFER` records have a higher average transaction amount (1,480,891.67) than non-fraud-labelled `TRANSFER` records (906,229.01). For `CASH_OUT`, the pattern is reversed: the fraud-labelled group averages 1,455,102.59, compared with 1,739,917.16 for the non-fraud-labelled group. These are descriptive comparisons within the synthetic dataset, not evidence of a real-world fraud signal.
+- Fraud-labelled `TRANSFER` records have a higher average transaction amount (1,480,891.67) than non-fraud-labelled `TRANSFER` records (906,229.01). For `CASH_OUT`, the pattern is reversed: the fraud-labelled group averages 1,455,102.59, compared with 1,739,917.16 for the non-fraud-labelled group. These are descriptive comparisons within the synthetic dataset, not evidence of a real-world fraud signal.
 - Q10 uses separate expected-movement logic for incoming and outgoing sender transactions. Recipient reconciliation is limited to eligible, non-fraud-labelled `TRANSFER` records with tracked recipient balances.
 - The recorded independent validation results include **8 passing Q7 checks, 16 passing Q8 checks, 10 passing Q9 checks, and 26 passing Q10 checks**.
 
