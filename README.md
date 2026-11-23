@@ -282,7 +282,7 @@ activate a virtual environment, then install Pandas:
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install pandas
+python -m pip install pandas==3.1.1
 ```
 
 ### 1. Obtain the dataset
