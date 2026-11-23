@@ -414,7 +414,7 @@ Lopez-Rojas, E. A., Elmir, A., and Axelsson, S. (2016). *PaySim: A Financial Mob
 | Phase 3 — Analytical Question Development | Completed |
 | Phase 4 — SQL Implementation | Completed |
 | Phase 5 — Results & Insights | Completed |
-| Phase 6 — Portfolio Publication | In Progress |
+| Phase 6 — Portfolio Publication | Completed |
 
 All ten analytical questions have been implemented.
 Results and interpretations have been documented,
